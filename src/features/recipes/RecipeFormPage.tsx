@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
@@ -71,8 +71,7 @@ export function RecipeFormPage() {
     setSteps((prev) => prev.filter((_, i) => i !== index))
   }
 
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault()
+  async function handleSubmit() {
     setError(null)
 
     if (!profile) return
@@ -138,7 +137,7 @@ export function RecipeFormPage() {
       )}
       <h1 className="text-2xl font-semibold">{recipeId ? 'Editar receta' : 'Nueva receta'}</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-6">
         {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
         <section className="rounded-lg border border-neutral-200 bg-white p-4">
@@ -199,6 +198,12 @@ export function RecipeFormPage() {
             </div>
           </div>
         </section>
+
+        {recipeId && profile && <RecipeComponentsSection recipeId={recipeId} businessId={profile.business_id} />}
+
+        {!recipeId && (
+          <p className="text-sm text-neutral-500">Guarda los datos básicos primero para poder añadir componentes.</p>
+        )}
 
         <section className="rounded-lg border border-neutral-200 bg-white p-4">
           <h2 className="text-lg font-medium">Elaboración</h2>
@@ -328,19 +333,14 @@ export function RecipeFormPage() {
         </section>
 
         <button
-          type="submit"
+          type="button"
+          onClick={handleSubmit}
           disabled={saving}
           className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
           {saving ? 'Guardando…' : recipeId ? 'Guardar cambios' : 'Crear receta'}
         </button>
-      </form>
-
-      {recipeId && profile && <RecipeComponentsSection recipeId={recipeId} businessId={profile.business_id} />}
-
-      {!recipeId && (
-        <p className="text-sm text-neutral-500">Guarda la receta primero para poder añadir componentes.</p>
-      )}
+      </div>
     </div>
   )
 }

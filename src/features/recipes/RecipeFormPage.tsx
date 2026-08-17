@@ -31,6 +31,7 @@ export function RecipeFormPage() {
   const [conservationNotes, setConservationNotes] = useState('')
 
   const [loading, setLoading] = useState(Boolean(id))
+  const [notFound, setNotFound] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -54,6 +55,8 @@ export function RecipeFormPage() {
       setConservationTemperature(data.conservation_temperature ?? '')
       setConservationShelfLife(data.conservation_shelf_life ?? '')
       setConservationNotes(data.conservation_notes ?? '')
+    } else {
+      setNotFound(true)
     }
     setLoading(false)
   }
@@ -120,6 +123,10 @@ export function RecipeFormPage() {
 
   if (loading) {
     return <p className="text-neutral-500">Cargando…</p>
+  }
+
+  if (notFound) {
+    return <p className="text-neutral-500">Receta no encontrada.</p>
   }
 
   return (

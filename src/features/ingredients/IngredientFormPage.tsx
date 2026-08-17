@@ -20,6 +20,7 @@ export function IngredientFormPage() {
   const [usageUnit, setUsageUnit] = useState<Unit>('g')
 
   const [loading, setLoading] = useState(isEdit)
+  const [notFound, setNotFound] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,6 +36,8 @@ export function IngredientFormPage() {
       setName(data.name)
       setCategory(data.category ?? '')
       setUsageUnit(data.usage_unit)
+    } else {
+      setNotFound(true)
     }
     setLoading(false)
   }
@@ -81,6 +84,10 @@ export function IngredientFormPage() {
 
   if (loading) {
     return <p className="text-neutral-500">Cargando…</p>
+  }
+
+  if (notFound) {
+    return <p className="text-neutral-500">Ingrediente no encontrado.</p>
   }
 
   return (

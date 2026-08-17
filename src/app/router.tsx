@@ -1,5 +1,8 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { AppLayout } from '@/app/AppLayout'
+import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
+import { LoginPage } from '@/features/auth/LoginPage'
+import { SignUpPage } from '@/features/auth/SignUpPage'
 import { HomePage } from '@/features/home/HomePage'
 import { IngredientsPage } from '@/features/ingredients/IngredientsPage'
 import { RecipesPage } from '@/features/recipes/RecipesPage'
@@ -7,15 +10,22 @@ import { ProductionPage } from '@/features/production/ProductionPage'
 import { SettingsPage } from '@/features/settings/SettingsPage'
 
 const router = createBrowserRouter([
+  { path: '/login', element: <LoginPage /> },
+  { path: '/signup', element: <SignUpPage /> },
   {
     path: '/',
-    element: <AppLayout />,
+    element: <ProtectedRoute />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: 'ingredientes', element: <IngredientsPage /> },
-      { path: 'recetas', element: <RecipesPage /> },
-      { path: 'produccion', element: <ProductionPage /> },
-      { path: 'configuracion', element: <SettingsPage /> },
+      {
+        element: <AppLayout />,
+        children: [
+          { index: true, element: <HomePage /> },
+          { path: 'ingredientes', element: <IngredientsPage /> },
+          { path: 'recetas', element: <RecipesPage /> },
+          { path: 'produccion', element: <ProductionPage /> },
+          { path: 'configuracion', element: <SettingsPage /> },
+        ],
+      },
     ],
   },
 ])

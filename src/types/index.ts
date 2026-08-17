@@ -63,3 +63,35 @@ export type IngredientCost = {
   unit_cost: number | null
   missing_reason: string | null
 }
+
+export type Recipe = {
+  id: string
+  business_id: string
+  name: string
+  category: string | null
+  code: string | null
+  status: string
+  version: number
+  steps: string[]
+  yield_quantity: number | null
+  yield_unit: Unit | null
+  conservation_method: string | null
+  conservation_temperature: string | null
+  conservation_shelf_life: string | null
+  conservation_notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type RecipeComponentType = 'ingredient' | 'recipe'
+
+export type RecipeComponent = {
+  id: string
+  recipe_id: string
+  component_type: RecipeComponentType
+  ingredient_id: string | null
+  component_recipe_id: string | null
+  quantity: number
+  unit: Unit
+  position: number
+}

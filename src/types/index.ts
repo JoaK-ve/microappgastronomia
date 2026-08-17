@@ -106,3 +106,25 @@ export type RecipeCost = {
   yield_available: boolean
   missing_reasons: string[]
 }
+
+export type ProductionComponent = {
+  component_type: RecipeComponentType
+  ingredient_id: string | null
+  component_recipe_id: string | null
+  name: string
+  original_quantity: number
+  unit: Unit
+  scaled_quantity: number
+}
+
+export type Production = {
+  id: string
+  business_id: string
+  recipe_id: string
+  requested_quantity: number
+  requested_unit: Unit
+  scale_factor: number
+  resulting_components: ProductionComponent[]
+  produced_by: string | null
+  created_at: string
+}

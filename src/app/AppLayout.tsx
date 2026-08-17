@@ -16,7 +16,7 @@ export function AppLayout() {
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
       <div className="flex min-h-screen flex-col md:flex-row">
-        <nav className="flex flex-col border-b border-neutral-200 bg-white md:w-56 md:border-b-0 md:border-r">
+        <nav className="flex flex-col border-b border-neutral-200 bg-white print:hidden md:w-56 md:border-b-0 md:border-r">
           <div className="px-4 py-4 text-lg font-semibold">MicroApp Gastronómica</div>
           <ul className="flex flex-row overflow-x-auto px-2 pb-2 md:flex-col md:overflow-visible md:px-2">
             {NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin).map((item) => (
@@ -49,7 +49,7 @@ export function AppLayout() {
             </button>
           </div>
         </nav>
-        <main className="flex-1 p-4 md:p-8">
+        <main className="flex-1 p-4 print:p-0 md:p-8">
           <Outlet />
         </main>
       </div>

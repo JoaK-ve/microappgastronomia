@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { RecipeComponentsSection } from '@/features/recipes/RecipeComponentsSection'
@@ -115,7 +115,7 @@ export function RecipeFormPage() {
     }
 
     setRecipeId(data.id)
-    navigate(`/recetas/${data.id}`, { replace: true })
+    navigate(`/recetas/${data.id}/editar`, { replace: true })
   }
 
   if (loading) {
@@ -124,6 +124,11 @@ export function RecipeFormPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
+      {recipeId && (
+        <Link to={`/recetas/${recipeId}`} className="text-sm text-neutral-500 hover:underline">
+          ← Ver ficha
+        </Link>
+      )}
       <h1 className="text-2xl font-semibold">{recipeId ? 'Editar receta' : 'Nueva receta'}</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">

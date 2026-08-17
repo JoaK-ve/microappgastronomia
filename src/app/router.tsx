@@ -8,6 +8,7 @@ import { IngredientsPage } from '@/features/ingredients/IngredientsPage'
 import { IngredientFormPage } from '@/features/ingredients/IngredientFormPage'
 import { RecipesPage } from '@/features/recipes/RecipesPage'
 import { RecipeFormPage } from '@/features/recipes/RecipeFormPage'
+import { RecipeViewPage } from '@/features/recipes/RecipeViewPage'
 import { ProductionPage } from '@/features/production/ProductionPage'
 import { SettingsPage } from '@/features/settings/SettingsPage'
 
@@ -27,7 +28,8 @@ const router = createBrowserRouter([
           { path: 'ingredientes/:id', element: <IngredientFormPage /> },
           { path: 'recetas', element: <RecipesPage /> },
           { path: 'recetas/nueva', element: <RecipeFormPage /> },
-          { path: 'recetas/:id', element: <RecipeFormPage /> },
+          { path: 'recetas/:id', element: <RecipeViewPage /> },
+          { path: 'recetas/:id/editar', element: <RecipeFormPage /> },
           { path: 'produccion', element: <ProductionPage /> },
           { path: 'configuracion', element: <SettingsPage /> },
         ],

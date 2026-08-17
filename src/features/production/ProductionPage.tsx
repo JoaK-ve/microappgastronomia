@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import type { Production, Profile, Recipe } from '@/types'
 
 export function ProductionPage() {
+  const [searchParams] = useSearchParams()
+  const preselectedRecipeId = searchParams.get('receta')
+
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [recentProductions, setRecentProductions] = useState<Production[]>([])
 
-  const [selectedRecipeId, setSelectedRecipeId] = useState('')
+  const [selectedRecipeId, setSelectedRecipeId] = useState(preselectedRecipeId ?? '')
   const [quantity, setQuantity] = useState('')
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -77,9 +81,9 @@ export function ProductionPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">Producción</h1>
+      <h1 className="text-2xl font-semibold print:hidden">Producción</h1>
 
-      <section className="rounded-lg border border-neutral-200 bg-white p-4">
+      <section className="rounded-lg border border-neutral-200 bg-white p-4 print:hidden">
         <h2 className="text-lg font-medium">Generar hoja de producción</h2>
 
         <div className="mt-3 space-y-3">
@@ -144,12 +148,23 @@ export function ProductionPage() {
       </section>
 
       {lastProduction && (
-        <section className="rounded-lg border border-neutral-200 bg-white p-4">
-          <h2 className="text-lg font-medium">Hoja de producción generada</h2>
-          <p className="mt-1 text-sm text-neutral-600">
-            {recipeName(lastProduction.recipe_id)} — {lastProduction.requested_quantity}{' '}
-            {lastProduction.requested_unit} (factor {lastProduction.scale_factor.toFixed(4)})
-          </p>
+        <section className="rounded-lg border border-neutral-200 bg-white p-4 print:border-0 print:p-0">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-medium">Hoja de producción generada</h2>
+              <p className="mt-1 text-sm text-neutral-600">
+                {recipeName(lastProduction.recipe_id)} — {lastProduction.requested_quantity}{' '}
+                {lastProduction.requested_unit} (factor {lastProduction.scale_factor.toFixed(4)})
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="shrink-0 rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white print:hidden"
+            >
+              Imprimir / PDF
+            </button>
+          </div>
 
           <table className="mt-3 w-full text-sm">
             <thead>
@@ -196,7 +211,7 @@ export function ProductionPage() {
         </section>
       )}
 
-      <section className="rounded-lg border border-neutral-200 bg-white p-4">
+      <section className="rounded-lg border border-neutral-200 bg-white p-4 print:hidden">
         <h2 className="text-lg font-medium">Producciones recientes</h2>
         {recentProductions.length === 0 ? (
           <p className="mt-2 text-sm text-neutral-400">Todavía no se ha generado ninguna producción.</p>

@@ -107,6 +107,17 @@ export type RecipeCost = {
   missing_reasons: string[]
 }
 
+export type RecipeComponentCost = {
+  component_id: string
+  component_type: RecipeComponentType
+  name: string
+  quantity: number
+  unit: Unit
+  unit_cost: number | null
+  component_cost: number | null
+  missing_reason: string | null
+}
+
 export type ProductionComponent = {
   component_type: RecipeComponentType
   ingredient_id: string | null

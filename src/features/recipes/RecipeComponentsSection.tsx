@@ -1,13 +1,18 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '@/lib/supabase'
-import type { Ingredient, Recipe, RecipeComponent, RecipeComponentType, Unit } from '@/types'
+import { useAuth } from '@/features/auth/AuthContext'
+import type { Ingredient, Recipe, RecipeComponent, RecipeComponentType, RecipeCost, Unit } from '@/types'
 
 const UNITS: Unit[] = ['g', 'kg', 'ml', 'L', 'ud']
 
 export function RecipeComponentsSection({ recipeId, businessId }: { recipeId: string; businessId: string }) {
+  const { profile } = useAuth()
+  const isAdmin = profile?.role === 'admin'
+
   const [components, setComponents] = useState<RecipeComponent[]>([])
   const [ingredients, setIngredients] = useState<Ingredient[]>([])
   const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [cost, setCost] = useState<RecipeCost | null>(null)
 
   const [componentType, setComponentType] = useState<RecipeComponentType>('ingredient')
   const [selectedId, setSelectedId] = useState('')
@@ -17,7 +22,7 @@ export function RecipeComponentsSection({ recipeId, businessId }: { recipeId: st
 
   useEffect(() => {
     void loadAll()
-  }, [recipeId])
+  }, [recipeId, isAdmin])
 
   async function loadAll() {
     const [{ data: comps }, { data: ings }, { data: recs }] = await Promise.all([
@@ -28,6 +33,11 @@ export function RecipeComponentsSection({ recipeId, businessId }: { recipeId: st
     setComponents((comps as RecipeComponent[]) ?? [])
     setIngredients((ings as Ingredient[]) ?? [])
     setRecipes((recs as Recipe[]) ?? [])
+
+    if (isAdmin) {
+      const { data: costData } = await supabase.from('recipe_costs').select('*').eq('recipe_id', recipeId).single()
+      setCost((costData as RecipeCost) ?? null)
+    }
   }
 
   function displayName(component: RecipeComponent) {
@@ -84,6 +94,36 @@ export function RecipeComponentsSection({ recipeId, businessId }: { recipeId: st
     <section className="rounded-lg border border-neutral-200 bg-white p-4">
       <h2 className="text-lg font-medium">Componentes</h2>
       <p className="mt-1 text-sm text-neutral-500">Un componente es un ingrediente o una receta (subreceta).</p>
+
+      {isAdmin && cost && (
+        <div className="mt-3 space-y-1 rounded-md bg-neutral-50 px-3 py-2 text-sm">
+          {cost.is_complete && cost.total_cost != null ? (
+            <p>
+              Coste total: <strong>{cost.total_cost.toFixed(2)} €</strong>
+              {cost.unit_cost != null ? (
+                <>
+                  {' '}
+                  — Coste por unidad de rendimiento: <strong>{cost.unit_cost.toFixed(4)} €</strong>
+                </>
+              ) : (
+                <span className="text-amber-600">
+                  {' '}
+                  — Coste unitario: — (falta definir el rendimiento para calcularlo)
+                </span>
+              )}
+            </p>
+          ) : (
+            <div>
+              <p className="font-medium text-amber-600">Coste incompleto</p>
+              <ul className="list-disc pl-5 text-amber-600">
+                {cost.missing_reasons.map((reason, index) => (
+                  <li key={index}>{reason}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       {components.length > 0 && (
         <ul className="mt-3 divide-y divide-neutral-100">

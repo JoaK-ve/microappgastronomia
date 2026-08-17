@@ -95,3 +95,13 @@ export type RecipeComponent = {
   unit: Unit
   position: number
 }
+
+export type RecipeCost = {
+  recipe_id: string
+  business_id: string
+  total_cost: number | null
+  unit_cost: number | null
+  is_complete: boolean
+  yield_available: boolean
+  missing_reasons: string[]
+}

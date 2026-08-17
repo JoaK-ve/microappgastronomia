@@ -99,6 +99,7 @@ export type RecipeComponent = {
 export type RecipeCost = {
   recipe_id: string
   business_id: string
+  recipe_found: boolean
   total_cost: number | null
   unit_cost: number | null
   is_complete: boolean

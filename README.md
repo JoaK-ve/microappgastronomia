@@ -17,21 +17,22 @@ Especificación funcional: Documento Maestro — MicroApp Gastronómica V0.4.
 
 ```
 src/
-  app/              # layout y rutas
+  app/              # layout, router y protección de rutas
   features/         # una carpeta por sección de negocio
+    auth/           # login, registro, sesión
     home/
     ingredients/
     recipes/
+      views/        # Cocina / Costes / Producir / Completa (misma receta, sin duplicar datos)
     production/
-    settings/
-  components/       # UI reutilizable entre features
+    settings/       # negocio, usuarios (solo admin)
   lib/
     supabase.ts     # cliente Supabase
   types/            # tipos compartidos
   test/             # setup de Vitest
 supabase/
-  migrations/       # esquema SQL versionado
-  seed/             # datos de demostración (DEMO — no usar en producción)
+  migrations/       # esquema SQL versionado (RLS, motor de costes, producción)
+  functions/        # Edge Functions (invite-user)
 ```
 
 ## Desarrollo local
@@ -72,8 +73,28 @@ Build de producción:
 npm run build
 ```
 
-Salida en `dist/`, desplegable en Cloudflare Pages (`wrangler.jsonc` ya
-apunta a ese directorio).
+Salida en `dist/`. El proyecto es una SPA: `public/_redirects` (copiado a
+`dist/` en cada build) hace que Cloudflare Pages sirva `index.html` para
+cualquier ruta (`/recetas/:id`, etc.), necesario para que las rutas de
+React Router funcionen al recargar o compartir un enlace directo.
+
+Desplegar en Cloudflare Pages:
+
+```bash
+npx wrangler pages deploy dist --project-name microappgastronomia
+```
+
+La primera vez, `wrangler` pedirá confirmar la creación del proyecto en
+Cloudflare. Variables de entorno (`VITE_SUPABASE_URL`,
+`VITE_SUPABASE_ANON_KEY`) se necesitan en **tiempo de build**, no en
+runtime (Vite las incrusta en el bundle) — configúralas como variables
+de build en el proyecto de Cloudflare Pages, o expórtalas antes de
+`npm run build` en tu pipeline de CI.
+
+**Nunca** despliegues la `service_role` key de Supabase en el frontend —
+solo la usan las migraciones (vía CLI, en tu máquina) y la Edge Function
+`invite-user` (donde Supabase la inyecta automáticamente en tiempo de
+ejecución, nunca en el bundle del cliente).
 
 ## Estado
 

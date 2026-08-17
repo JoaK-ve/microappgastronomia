@@ -4,10 +4,11 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { CocinaView } from '@/features/recipes/views/CocinaView'
 import { CostesView } from '@/features/recipes/views/CostesView'
+import { ProducirView } from '@/features/recipes/views/ProducirView'
 import { CompletaView } from '@/features/recipes/views/CompletaView'
 import type { Ingredient, Recipe, RecipeComponent, RecipeComponentCost, RecipeCost } from '@/types'
 
-type Tab = 'cocina' | 'costes' | 'completa'
+type Tab = 'cocina' | 'costes' | 'producir' | 'completa'
 
 export function RecipeViewPage() {
   const { id } = useParams()
@@ -94,12 +95,6 @@ export function RecipeViewPage() {
           >
             Editar
           </Link>
-          <Link
-            to={`/produccion?receta=${recipe.id}`}
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700"
-          >
-            Producción
-          </Link>
           <button
             type="button"
             onClick={() => window.print()}
@@ -126,22 +121,29 @@ export function RecipeViewPage() {
           Cocina
         </button>
         {isAdmin && (
-          <>
-            <button
-              type="button"
-              onClick={() => setTab('costes')}
-              className={`px-3 py-2 text-sm font-medium ${tab === 'costes' ? 'border-b-2 border-neutral-900 text-neutral-900' : 'text-neutral-500'}`}
-            >
-              Costes
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab('completa')}
-              className={`px-3 py-2 text-sm font-medium ${tab === 'completa' ? 'border-b-2 border-neutral-900 text-neutral-900' : 'text-neutral-500'}`}
-            >
-              Completa
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={() => setTab('costes')}
+            className={`px-3 py-2 text-sm font-medium ${tab === 'costes' ? 'border-b-2 border-neutral-900 text-neutral-900' : 'text-neutral-500'}`}
+          >
+            Costes
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => setTab('producir')}
+          className={`px-3 py-2 text-sm font-medium ${tab === 'producir' ? 'border-b-2 border-neutral-900 text-neutral-900' : 'text-neutral-500'}`}
+        >
+          Producir
+        </button>
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={() => setTab('completa')}
+            className={`px-3 py-2 text-sm font-medium ${tab === 'completa' ? 'border-b-2 border-neutral-900 text-neutral-900' : 'text-neutral-500'}`}
+          >
+            Completa
+          </button>
         )}
       </div>
 
@@ -155,6 +157,7 @@ export function RecipeViewPage() {
           />
         )}
         {tab === 'costes' && isAdmin && <CostesView cost={cost} componentCosts={componentCosts} />}
+        {tab === 'producir' && <ProducirView recipe={recipe} />}
         {tab === 'completa' && isAdmin && (
           <CompletaView
             recipe={recipe}

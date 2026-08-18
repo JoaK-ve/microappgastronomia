@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '@/features/auth/AuthContext'
+import { APP_VERSION_DISPLAY } from '@/lib/version'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Inicio', end: true, adminOnly: false },
@@ -48,6 +49,9 @@ export function AppLayout() {
               Cerrar sesión
             </button>
           </div>
+          <p className="border-t border-neutral-200 px-4 py-2 text-right text-xs text-neutral-400">
+            {APP_VERSION_DISPLAY}
+          </p>
         </nav>
         <main className="flex-1 p-4 print:p-0 md:p-8">
           <Outlet />

@@ -5,6 +5,24 @@ cocineros y pequeños negocios gastronómicos.
 
 Especificación funcional: Documento Maestro — MicroApp Gastronómica V0.4.
 
+## Versión actual
+
+**V1.0.0**
+
+Esquema `VMAJOR.MINOR.PATCH` (versión de la **aplicación**, no de las
+recetas — son conceptos independientes; la versión de cada receta vive
+en `recipes.version`):
+
+- **MAJOR** — generación principal del producto. Solo cambia por decisión
+  explícita, nunca automáticamente.
+- **MINOR** (0–20) — cambio o mejora de impacto medio.
+- **PATCH** (0–20) — corrección o ajuste menor.
+
+La fuente única de verdad es `package.json` (`version`); Vite la inyecta
+en el frontend en tiempo de build (`src/lib/version.ts`). Se muestra de
+forma discreta en la parte inferior del menú principal. Historial de
+cambios en [`CHANGELOG.md`](./CHANGELOG.md).
+
 ## Stack
 
 - **Frontend:** React + TypeScript + Vite, Tailwind CSS v4, React Router.
@@ -98,4 +116,6 @@ ejecución, nunca en el bundle del cliente).
 
 ## Estado
 
-En desarrollo por fases. Ver progreso en el historial de commits.
+V1.0.0 — funcional, desplegable. Ver [`CHANGELOG.md`](./CHANGELOG.md) para
+el detalle de qué incluye, y el historial de commits para el desarrollo
+por fases.

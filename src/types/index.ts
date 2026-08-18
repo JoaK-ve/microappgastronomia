@@ -139,3 +139,10 @@ export type Production = {
   produced_by: string | null
   created_at: string
 }
+
+export type ProductionReference = {
+  reference_quantity: number | null
+  reference_unit: Unit | null
+  source: 'yield' | 'formula' | null
+  error_reason: string | null
+}

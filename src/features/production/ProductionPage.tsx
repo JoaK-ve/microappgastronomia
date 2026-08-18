@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
-import type { Production, Profile, Recipe } from '@/types'
+import type { Production, ProductionReference, Profile, Recipe } from '@/types'
 
 export function ProductionPage() {
   const [searchParams] = useSearchParams()
@@ -12,6 +12,9 @@ export function ProductionPage() {
   const [recentProductions, setRecentProductions] = useState<Production[]>([])
 
   const [selectedRecipeId, setSelectedRecipeId] = useState(preselectedRecipeId ?? '')
+  const [reference, setReference] = useState<ProductionReference | null>(null)
+  const [loadingReference, setLoadingReference] = useState(false)
+
   const [quantity, setQuantity] = useState('')
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -22,6 +25,22 @@ export function ProductionPage() {
   useEffect(() => {
     void loadAll()
   }, [])
+
+  useEffect(() => {
+    if (!selectedRecipeId) {
+      setReference(null)
+      return
+    }
+    setLoadingReference(true)
+    setReference(null)
+    supabase
+      .rpc('get_recipe_production_reference', { p_recipe_id: selectedRecipeId })
+      .then(({ data }) => {
+        const rows = data as ProductionReference[] | null
+        setReference(rows?.[0] ?? null)
+        setLoadingReference(false)
+      })
+  }, [selectedRecipeId])
 
   async function loadAll() {
     setLoading(true)
@@ -103,25 +122,33 @@ export function ProductionPage() {
             >
               <option value="">Elige una receta…</option>
               {recipes.map((recipe) => (
-                <option key={recipe.id} value={recipe.id} disabled={recipe.yield_quantity == null}>
+                <option key={recipe.id} value={recipe.id}>
                   {recipe.name}
-                  {recipe.yield_quantity == null ? ' (sin rendimiento — no se puede producir)' : ''}
                 </option>
               ))}
             </select>
           </div>
 
-          {selectedRecipe && selectedRecipe.yield_quantity != null && (
+          {selectedRecipe && loadingReference && <p className="text-sm text-neutral-500">Cargando…</p>}
+
+          {selectedRecipe && !loadingReference && reference?.error_reason && (
+            <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700">{reference.error_reason}</p>
+          )}
+
+          {selectedRecipe && !loadingReference && reference && !reference.error_reason && (
             <form onSubmit={handleGenerate} className="space-y-3">
               <p className="text-sm text-neutral-600">
-                Rendimiento estándar: <strong>{selectedRecipe.yield_quantity} {selectedRecipe.yield_unit}</strong>
+                {reference.source === 'yield'
+                  ? 'Rendimiento estándar'
+                  : 'Cantidad base de la fórmula (sin rendimiento definido)'}
+                : <strong>{reference.reference_quantity} {reference.reference_unit}</strong>
               </p>
 
               {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
               <div>
                 <label htmlFor="quantity" className="block text-sm font-medium text-neutral-700">
-                  ¿Cuánto quieres producir? ({selectedRecipe.yield_unit})
+                  ¿Cuánto quieres producir? ({reference.reference_unit})
                 </label>
                 <input
                   id="quantity"

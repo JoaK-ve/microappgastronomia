@@ -1,17 +1,36 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '@/lib/supabase'
-import type { Production, Recipe } from '@/types'
+import type { Production, ProductionReference, Recipe } from '@/types'
 
 export function ProducirView({ recipe }: { recipe: Recipe }) {
+  const [reference, setReference] = useState<ProductionReference | null>(null)
+  const [loadingReference, setLoadingReference] = useState(true)
+
   const [quantity, setQuantity] = useState('')
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<Production | null>(null)
 
-  if (recipe.yield_quantity == null) {
+  useEffect(() => {
+    setLoadingReference(true)
+    setResult(null)
+    supabase
+      .rpc('get_recipe_production_reference', { p_recipe_id: recipe.id })
+      .then(({ data }) => {
+        const rows = data as ProductionReference[] | null
+        setReference(rows?.[0] ?? null)
+        setLoadingReference(false)
+      })
+  }, [recipe.id])
+
+  if (loadingReference) {
+    return <p className="text-sm text-neutral-500">Cargando…</p>
+  }
+
+  if (!reference || reference.error_reason) {
     return (
       <p className="text-sm text-amber-600">
-        Esta receta no tiene rendimiento definido — añádelo en Editar para poder producirla.
+        {reference?.error_reason ?? 'No se pudo calcular una cantidad base para producir esta receta.'}
       </p>
     )
   }
@@ -40,14 +59,15 @@ export function ProducirView({ recipe }: { recipe: Recipe }) {
     <div className="space-y-6 print:space-y-4">
       <form onSubmit={handleGenerate} className="space-y-3 print:hidden">
         <p className="text-sm text-neutral-600">
-          Rendimiento estándar: <strong>{recipe.yield_quantity} {recipe.yield_unit}</strong>
+          {reference.source === 'yield' ? 'Rendimiento estándar' : 'Cantidad base de la fórmula (sin rendimiento definido)'}
+          : <strong>{reference.reference_quantity} {reference.reference_unit}</strong>
         </p>
 
         {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
         <div>
           <label htmlFor="producirQuantity" className="block text-sm font-medium text-neutral-700">
-            ¿Cuánto quieres producir? ({recipe.yield_unit})
+            ¿Cuánto quieres producir? ({reference.reference_unit})
           </label>
           <input
             id="producirQuantity"

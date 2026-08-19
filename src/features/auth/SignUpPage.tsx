@@ -5,8 +5,10 @@ import { supabase } from '@/lib/supabase'
 export function SignUpPage() {
   const [businessName, setBusinessName] = useState('')
   const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [pendingConfirmation, setPendingConfirmation] = useState(false)
@@ -15,13 +17,19 @@ export function SignUpPage() {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
+
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden.')
+      return
+    }
+
     setLoading(true)
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { business_name: businessName, name },
+        data: { business_name: businessName, name, phone },
       },
     })
 
@@ -60,6 +68,10 @@ export function SignUpPage() {
         className="w-full max-w-sm space-y-4 rounded-lg border border-neutral-200 bg-white p-6 shadow-sm"
       >
         <h1 className="text-xl font-semibold">Crear tu negocio</h1>
+        <p className="text-sm text-neutral-600">
+          Prueba gratuita de <strong>14 días</strong>, sin tarjeta. Podrás completar dirección, logo y demás datos
+          más adelante desde Configuración.
+        </p>
 
         {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
@@ -92,6 +104,21 @@ export function SignUpPage() {
         </div>
 
         <div>
+          <label htmlFor="phone" className="block text-sm font-medium text-neutral-700">
+            Teléfono
+          </label>
+          <input
+            id="phone"
+            type="text"
+            required
+            autoComplete="tel"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
           <label htmlFor="email" className="block text-sm font-medium text-neutral-700">
             Email
           </label>
@@ -118,6 +145,22 @@ export function SignUpPage() {
             autoComplete="new-password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-neutral-700">
+            Confirmar contraseña
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
             className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
           />
         </div>

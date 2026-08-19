@@ -20,10 +20,12 @@ export function AppLayout() {
   const { session, profile, signOut } = useAuth()
   const isAdmin = profile?.role === 'admin'
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
+  const [trialDaysLeft, setTrialDaysLeft] = useState<number | null>(null)
 
   useEffect(() => {
     if (!profile?.business_id) {
       setLogoUrl(null)
+      setTrialDaysLeft(null)
       return
     }
 
@@ -31,21 +33,32 @@ export function AppLayout() {
 
     supabase
       .from('businesses')
-      .select('logo_url')
+      .select('logo_url, status, trial_ends_at')
       .eq('id', profile.business_id)
       .single()
       .then(({ data }) => {
-        const path = (data as { logo_url: string | null } | null)?.logo_url
+        if (cancelled) return
+
+        const business = data as { logo_url: string | null; status: string; trial_ends_at: string | null } | null
+
+        const path = business?.logo_url
         if (!path) {
-          if (!cancelled) setLogoUrl(null)
-          return
+          setLogoUrl(null)
+        } else {
+          supabase.storage
+            .from(LOGO_BUCKET)
+            .createSignedUrl(path, 3600)
+            .then(({ data: signed }) => {
+              if (!cancelled) setLogoUrl(signed?.signedUrl ?? null)
+            })
         }
-        supabase.storage
-          .from(LOGO_BUCKET)
-          .createSignedUrl(path, 3600)
-          .then(({ data: signed }) => {
-            if (!cancelled) setLogoUrl(signed?.signedUrl ?? null)
-          })
+
+        if (business?.status === 'trial' && business.trial_ends_at) {
+          const msLeft = new Date(business.trial_ends_at).getTime() - Date.now()
+          setTrialDaysLeft(Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000))))
+        } else {
+          setTrialDaysLeft(null)
+        }
       })
 
     return () => {
@@ -78,6 +91,15 @@ export function AppLayout() {
               <span className="truncate text-lg font-semibold">MicroApp Gastronómica</span>
             )}
           </div>
+
+          {trialDaysLeft != null && (
+            <div className="mx-4 mb-3 rounded-md bg-green-50 px-3 py-2 text-xs text-green-800">
+              🟢 Prueba gratuita
+              <br />
+              Te quedan {trialDaysLeft} día{trialDaysLeft === 1 ? '' : 's'}
+            </div>
+          )}
+
           <ul className="flex flex-row overflow-x-auto px-2 pb-2 md:flex-col md:overflow-visible md:px-2">
             {NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin).map((item) => (
               <li key={item.to} className="shrink-0">

@@ -15,6 +15,12 @@ function formatDate(value: string | null) {
   return new Date(value).toLocaleDateString('es-ES')
 }
 
+const ONE_DAY_MS = 24 * 60 * 60 * 1000
+
+function isRecent(createdAt: string) {
+  return Date.now() - new Date(createdAt).getTime() < ONE_DAY_MS
+}
+
 export function SuperAdminBusinessesPage() {
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
@@ -25,7 +31,7 @@ export function SuperAdminBusinessesPage() {
 
   async function loadBusinesses() {
     setLoading(true)
-    const { data } = await supabase.from('businesses').select('*').order('name')
+    const { data } = await supabase.from('businesses').select('*').order('created_at', { ascending: false })
     setBusinesses((data as Business[]) ?? [])
     setLoading(false)
   }
@@ -57,6 +63,11 @@ export function SuperAdminBusinessesPage() {
                   >
                     {business.name}
                   </Link>
+                  {isRecent(business.created_at) && (
+                    <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                      Nuevo
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-2 text-neutral-600">{STATUS_LABEL[business.status]}</td>
                 <td className="px-4 py-2 text-neutral-600">{formatDate(business.trial_ends_at)}</td>

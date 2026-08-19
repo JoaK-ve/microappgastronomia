@@ -4,6 +4,28 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.2.0
+
+SA-2: registro público de negocios + trial de 14 días.
+
+- Pantalla pública `/signup` ampliada: teléfono, confirmación de
+  contraseña, y aviso claro de "14 días gratis, sin tarjeta".
+- Al registrarse, se crea el negocio en estado `trial` con
+  `trial_started_at`/`trial_ends_at` (+14 días exactos) y el usuario
+  queda como su único ADMIN — usando el mismo trust boundary que ya
+  protegía las invitaciones (el backend decide business_id/role/status,
+  nunca el cliente).
+- Banner discreto "🟢 Prueba gratuita — Te quedan N días" en el sidebar
+  mientras el negocio esté en trial.
+- El panel de Super Admin ahora ordena los negocios por fecha de
+  creación (más nuevo primero) y marca los registrados en las últimas
+  24h como "Nuevo" — el aviso de "negocio nuevo registrado" sin
+  depender de correo (limitación conocida: sin infraestructura de email
+  propia todavía).
+- No incluye todavía expiración/bloqueo automático del trial,
+  activación o suspensión manual, pagos, ni modo soporte — eso
+  pertenece a SA-3 en adelante.
+
 ## V1.1.0
 
 Funcionalidades acumuladas desde V1.0.0 que nunca habían tenido su

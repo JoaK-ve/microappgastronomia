@@ -41,7 +41,20 @@ IMPORT-ING-1: importador inteligente de ingredientes.
 - Nuevas dependencias: `exceljs` (lectura de .xlsx) y `pdfjs-dist`
   (extracción de texto de PDF), cargadas solo bajo demanda al entrar al
   importador (code-splitting), sin afectar al tamaño de carga del resto
-  de la aplicación.
+  de la aplicación. Se descartó `xlsx` (SheetJS) por un CVE alto sin
+  parche en su versión de npm.
+- Riesgo residual aceptado (severidad moderada): `exceljs@4.4.0` trae
+  `uuid@8.3.2` como única dependencia transitoria, afectado por
+  GHSA-w5hq-g745-h8pq ("missing buffer bounds check en v3/v5/v6 cuando
+  se pasa un `buf` externo"). Verificado por inspección del paquete
+  fuente y del bundle real de producción: `exceljs` solo destructura
+  `v4` de `uuid` (nunca v3/v5/v6) y la llama sin argumentos, en un único
+  punto — generación de IDs para reglas de formato condicional
+  extendidas al *escribir* un .xlsx. El importador de OídoChef solo
+  *lee* archivos (`workbook.xlsx.load()`), nunca escribe — ese camino no
+  es alcanzable desde ninguna entrada que acepte el importador. No hay
+  fix disponible sin un downgrade con breaking change de `exceljs`; no
+  se aplicó ningún downgrade ni override de dependencias.
 
 ## V1.3.0
 

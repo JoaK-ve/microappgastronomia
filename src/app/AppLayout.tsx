@@ -4,6 +4,8 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ChangePasswordControl } from '@/components/ChangePasswordControl'
 import { APP_VERSION_DISPLAY } from '@/lib/version'
+import { getDaysRemaining, getEffectiveStatus, type EffectiveStatus } from '@/lib/businessLifecycle'
+import type { Business } from '@/types'
 
 const LOGO_BUCKET = 'logos'
 
@@ -20,12 +22,13 @@ export function AppLayout() {
   const { session, profile, signOut } = useAuth()
   const isAdmin = profile?.role === 'admin'
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
-  const [trialDaysLeft, setTrialDaysLeft] = useState<number | null>(null)
+  const [effectiveStatus, setEffectiveStatus] = useState<EffectiveStatus | null>(null)
+  const [daysRemaining, setDaysRemaining] = useState(0)
 
   useEffect(() => {
     if (!profile?.business_id) {
       setLogoUrl(null)
-      setTrialDaysLeft(null)
+      setEffectiveStatus(null)
       return
     }
 
@@ -39,7 +42,7 @@ export function AppLayout() {
       .then(({ data }) => {
         if (cancelled) return
 
-        const business = data as { logo_url: string | null; status: string; trial_ends_at: string | null } | null
+        const business = data as Pick<Business, 'logo_url' | 'status' | 'trial_ends_at'> | null
 
         const path = business?.logo_url
         if (!path) {
@@ -53,11 +56,12 @@ export function AppLayout() {
             })
         }
 
-        if (business?.status === 'trial' && business.trial_ends_at) {
-          const msLeft = new Date(business.trial_ends_at).getTime() - Date.now()
-          setTrialDaysLeft(Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000))))
+        if (business) {
+          const effective = getEffectiveStatus(business)
+          setEffectiveStatus(effective)
+          setDaysRemaining(getDaysRemaining(business, effective))
         } else {
-          setTrialDaysLeft(null)
+          setEffectiveStatus(null)
         }
       })
 
@@ -77,6 +81,30 @@ export function AppLayout() {
     return <Navigate to="/super-admin" replace />
   }
 
+  // Bloqueo real de acceso operativo: además de esto, el backend (RLS +
+  // business_is_operational()) ya rechaza cualquier escritura aunque se
+  // llame directo a la API — esta pantalla es solo la experiencia visible,
+  // no la protección de verdad.
+  if (effectiveStatus === 'suspended') {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-neutral-50 px-4 text-center">
+        <p className="text-3xl">🔒</p>
+        <h1 className="mt-2 text-xl font-semibold">Cuenta suspendida</h1>
+        <p className="mt-2 max-w-sm text-sm text-neutral-600">
+          Tu periodo de prueba y periodo de gracia han terminado. Contacta con OídoChef para activar nuevamente tu
+          cuenta.
+        </p>
+        <button
+          type="button"
+          onClick={() => void signOut()}
+          className="mt-4 text-sm text-neutral-500 underline hover:text-neutral-900"
+        >
+          Cerrar sesión
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
       <div className="flex min-h-screen flex-col md:flex-row">
@@ -92,11 +120,20 @@ export function AppLayout() {
             )}
           </div>
 
-          {trialDaysLeft != null && (
+          {effectiveStatus === 'trial' && (
             <div className="mx-4 mb-3 rounded-md bg-green-50 px-3 py-2 text-xs text-green-800">
               🟢 Prueba gratuita
               <br />
-              Te quedan {trialDaysLeft} día{trialDaysLeft === 1 ? '' : 's'}
+              Te quedan {daysRemaining} día{daysRemaining === 1 ? '' : 's'}
+            </div>
+          )}
+
+          {effectiveStatus === 'grace' && (
+            <div className="mx-4 mb-3 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              ⚠️ Periodo de prueba terminado
+              <br />
+              Te quedan {daysRemaining} día{daysRemaining === 1 ? '' : 's'} de gracia. Contacta con OídoChef para
+              continuar utilizando la plataforma.
             </div>
           )}
 

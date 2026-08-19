@@ -4,6 +4,32 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.3.0
+
+SA-3: ciclo de vida comercial — TRIAL → GRACE → SUSPENDED, y ACTIVE.
+
+- Reglas fijas: trial 14 días, gracia 7 días adicionales, active
+  indefinido hasta decisión del Super Admin, suspended bloquea el
+  acceso operativo sin borrar ningún dato.
+- GRACE nunca se guarda como valor de estado — se calcula en vivo a
+  partir de `trial_ends_at`, tanto en el backend (`business_is_operational()`)
+  como en el frontend, para que nunca queden desincronizados.
+- Bloqueo real (no solo visual): las políticas RLS de escritura de
+  ingredientes, recetas, componentes, producciones, categorías y
+  formatos de compra ahora exigen que el negocio esté operativo —
+  intentar la API directamente también queda rechazado.
+- Corregida una vulnerabilidad encontrada en la auditoría: la política
+  de auto-edición del negocio (Configuración) no restringía columnas y
+  permitía en teoría que un admin normal tocara su propio
+  status/fechas de trial por API directa. Nuevo trigger lo bloquea.
+- Panel de Super Admin: columnas Trial/Gracia, acciones Activar /
+  Suspender / Renovar trial (con confirmación), e historial básico de
+  cambios de estado por negocio.
+- Pantalla de bloqueo completo para negocios suspendidos, y banner de
+  aviso durante el periodo de gracia.
+- No incluye todavía expiración/suspensión automática por cron, pagos,
+  ni modo soporte — eso pertenece a SA-4 en adelante.
+
 ## V1.2.0
 
 SA-2: registro público de negocios + trial de 14 días.

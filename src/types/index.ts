@@ -24,6 +24,15 @@ export type Business = {
   updated_at: string
 }
 
+export type BusinessLifecycleEvent = {
+  id: string
+  business_id: string
+  actor_id: string | null
+  previous_status: BusinessStatus | null
+  new_status: BusinessStatus
+  created_at: string
+}
+
 export type Profile = {
   id: string
   business_id: string

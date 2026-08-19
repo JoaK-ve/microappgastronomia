@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
+import { BusinessLifecycleActions } from '@/components/BusinessLifecycleActions'
+import { getEffectiveStatus, getDaysRemaining, STATUS_LABEL, type EffectiveStatus } from '@/lib/businessLifecycle'
 import type { Business } from '@/types'
 
-const STATUS_LABEL: Record<Business['status'], string> = {
-  trial: 'Trial',
-  active: 'Active',
-  expired: 'Expired',
-  suspended: 'Suspended',
+const STATUS_BADGE_CLASS: Record<EffectiveStatus, string> = {
+  trial: 'bg-green-100 text-green-700',
+  grace: 'bg-amber-100 text-amber-700',
+  active: 'bg-neutral-900 text-white',
+  suspended: 'bg-red-100 text-red-700',
 }
 
 function formatDate(value: string | null) {
@@ -50,32 +52,53 @@ export function SuperAdminBusinessesPage() {
             <tr className="border-b border-neutral-200 text-left text-neutral-500">
               <th className="px-4 py-2 font-medium">Negocio</th>
               <th className="px-4 py-2 font-medium">Estado</th>
-              <th className="px-4 py-2 font-medium">Trial vence</th>
+              <th className="px-4 py-2 font-medium">Trial</th>
+              <th className="px-4 py-2 font-medium">Gracia</th>
+              <th className="px-4 py-2 font-medium">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {businesses.map((business) => (
-              <tr key={business.id} className="border-b border-neutral-100 last:border-0">
-                <td className="px-4 py-2">
-                  <Link
-                    to={`/super-admin/negocios/${business.id}`}
-                    className="font-medium text-neutral-900 hover:underline"
-                  >
-                    {business.name}
-                  </Link>
-                  {isRecent(business.created_at) && (
-                    <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                      Nuevo
+            {businesses.map((business) => {
+              const effective = getEffectiveStatus(business)
+              const graceEndsAt = business.trial_ends_at
+                ? new Date(new Date(business.trial_ends_at).getTime() + 7 * ONE_DAY_MS).toISOString()
+                : null
+              return (
+                <tr key={business.id} className="border-b border-neutral-100 last:border-0">
+                  <td className="px-4 py-2">
+                    <Link
+                      to={`/super-admin/negocios/${business.id}`}
+                      className="font-medium text-neutral-900 hover:underline"
+                    >
+                      {business.name}
+                    </Link>
+                    {isRecent(business.created_at) && (
+                      <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                        Nuevo
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2">
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASS[effective]}`}>
+                      {STATUS_LABEL[effective]}
                     </span>
-                  )}
-                </td>
-                <td className="px-4 py-2 text-neutral-600">{STATUS_LABEL[business.status]}</td>
-                <td className="px-4 py-2 text-neutral-600">{formatDate(business.trial_ends_at)}</td>
-              </tr>
-            ))}
+                    {effective !== 'suspended' && (
+                      <span className="ml-2 text-xs text-neutral-400">{getDaysRemaining(business, effective)}d</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2 text-neutral-600">{formatDate(business.trial_ends_at)}</td>
+                  <td className="px-4 py-2 text-neutral-600">
+                    {business.status === 'trial' ? formatDate(graceEndsAt) : '—'}
+                  </td>
+                  <td className="px-4 py-2">
+                    <BusinessLifecycleActions business={business} onChanged={loadBusinesses} compact />
+                  </td>
+                </tr>
+              )
+            })}
             {businesses.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-neutral-400">
+                <td colSpan={5} className="px-4 py-6 text-center text-neutral-400">
                   No hay negocios todavía.
                 </td>
               </tr>

@@ -181,3 +181,10 @@ export type RecipeDeleteBlockers = {
   used_as_subrecipe_names: string[]
   production_count: number
 }
+
+export type ImportRowResult = {
+  client_id: string
+  status: 'created' | 'updated' | 'error'
+  ingredient_id: string | null
+  message: string | null
+}

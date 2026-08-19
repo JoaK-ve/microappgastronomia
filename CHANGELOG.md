@@ -4,6 +4,45 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.4.0
+
+IMPORT-ING-1: importador inteligente de ingredientes.
+
+- Nueva pantalla `/ingredientes/importar`, accesible desde "Importar
+  ingredientes" junto a "+ Nuevo ingrediente". Flujo obligatorio: fuente
+  → análisis → mapeo → previsualización → validación → revisión →
+  confirmación → importación → resumen. Nunca se escribe nada en la base
+  de datos antes de la confirmación explícita del usuario.
+- Fuentes soportadas: Excel (.xlsx, con selector de hoja si hay varias),
+  CSV (detecta el separador automáticamente), texto pegado directamente,
+  y PDF (extrae texto y detecta estructura de tabla por posición; si no
+  hay confianza suficiente — p. ej. un PDF escaneado sin capa de texto —
+  no inventa nada y ofrece pegar el contenido como texto en su lugar).
+- Mapeo de columnas con detección automática de sinónimos habituales
+  (Ingrediente/Nombre/Producto, Precio/Coste/P. compra, Unidad/Ud./U.M.),
+  siempre editable antes de continuar; una columna sin mapear queda
+  como "Sin utilizar".
+- Cada fila queda en uno de seis estados (Nuevo, Existente, Posible
+  duplicado, Actualizar, Error, Ignorar), editable individualmente antes
+  de importar: se puede corregir nombre/categoría/unidad/precio, excluir
+  una fila o resolver un posible duplicado — nunca se fusiona una
+  coincidencia ambigua en automático.
+- Reutiliza exactamente el modelo y el mecanismo existentes: un
+  ingrediente nuevo crea una fila en `ingredients`, un precio (nuevo o
+  actualizado) crea una fila en `purchase_formats` — igual que el alta
+  manual. No se creó ninguna tabla, motor de coste ni sistema de precios
+  nuevo.
+- Escritura transaccional mediante una única función `import_ingredients`
+  (RPC): procesa solo las filas aprobadas, determina el negocio siempre
+  por la sesión (nunca por el archivo ni por el frontend), y queda sujeta
+  a la misma RLS que ya protege ingredients/purchase_formats — incluida
+  la exigencia de negocio operativo introducida en SA-3 (un negocio
+  suspendido no puede importar).
+- Nuevas dependencias: `exceljs` (lectura de .xlsx) y `pdfjs-dist`
+  (extracción de texto de PDF), cargadas solo bajo demanda al entrar al
+  importador (code-splitting), sin afectar al tamaño de carga del resto
+  de la aplicación.
+
 ## V1.3.0
 
 SA-3: ciclo de vida comercial — TRIAL → GRACE → SUSPENDED, y ACTIVE.

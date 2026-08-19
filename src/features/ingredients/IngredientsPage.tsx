@@ -60,6 +60,14 @@ export function IngredientsPage() {
           </button>
           {isAdmin && (
             <Link
+              to="/ingredientes/importar"
+              className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700"
+            >
+              Importar ingredientes
+            </Link>
+          )}
+          {isAdmin && (
+            <Link
               to="/ingredientes/nuevo"
               className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
             >

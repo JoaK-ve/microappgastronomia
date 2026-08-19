@@ -146,3 +146,22 @@ export type ProductionReference = {
   source: 'yield' | 'formula' | null
   error_reason: string | null
 }
+
+export type IngredientDeleteBlockers = {
+  used_in_recipe_count: number
+  used_in_recipe_names: string[]
+  purchase_format_count: number
+}
+
+export type RecipeCategory = {
+  id: string
+  business_id: string
+  name: string
+  created_at: string
+}
+
+export type RecipeDeleteBlockers = {
+  used_as_subrecipe_count: number
+  used_as_subrecipe_names: string[]
+  production_count: number
+}

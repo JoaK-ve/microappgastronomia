@@ -2,9 +2,10 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
+import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { EquivalencesSection } from '@/features/ingredients/EquivalencesSection'
 import { PurchaseFormatsSection } from '@/features/ingredients/PurchaseFormatsSection'
-import type { Unit } from '@/types'
+import type { IngredientDeleteBlockers, Unit } from '@/types'
 
 const UNITS: Unit[] = ['g', 'kg', 'ml', 'L', 'ud']
 
@@ -23,6 +24,10 @@ export function IngredientFormPage() {
   const [notFound, setNotFound] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const [deleteState, setDeleteState] = useState<'idle' | 'checking' | 'blocked' | 'confirm' | 'deleting'>('idle')
+  const [deleteBlockers, setDeleteBlockers] = useState<IngredientDeleteBlockers | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -82,6 +87,49 @@ export function IngredientFormPage() {
     navigate(`/ingredientes/${data.id}`, { replace: true })
   }
 
+  async function handleDeleteClick() {
+    if (!ingredientId) return
+    setDeleteState('checking')
+    setDeleteError(null)
+
+    const { data, error: checkError } = await supabase
+      .rpc('get_ingredient_delete_blockers', { p_ingredient_id: ingredientId })
+      .single()
+
+    if (checkError || !data) {
+      setDeleteError('No se pudo comprobar las dependencias del ingrediente. Inténtalo de nuevo.')
+      setDeleteState('idle')
+      return
+    }
+
+    const blockers = data as IngredientDeleteBlockers
+    setDeleteBlockers(blockers)
+    setDeleteState(blockers.used_in_recipe_count > 0 ? 'blocked' : 'confirm')
+  }
+
+  async function handleDeleteConfirm() {
+    if (!ingredientId) return
+    setDeleteState('deleting')
+    setDeleteError(null)
+
+    const { error: deleteRequestError } = await supabase.from('ingredients').delete().eq('id', ingredientId)
+
+    if (deleteRequestError) {
+      setDeleteError(
+        'No se pudo eliminar el ingrediente. Puede que se haya empezado a usar en una receta justo ahora — recarga la página e inténtalo de nuevo.',
+      )
+      setDeleteState('confirm')
+      return
+    }
+
+    navigate('/ingredientes', { replace: true })
+  }
+
+  function handleDeleteCancel() {
+    setDeleteState('idle')
+    setDeleteError(null)
+  }
+
   if (loading) {
     return <p className="text-neutral-500">Cargando…</p>
   }
@@ -92,7 +140,55 @@ export function IngredientFormPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">{ingredientId ? 'Editar ingrediente' : 'Nuevo ingrediente'}</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-semibold">{ingredientId ? 'Editar ingrediente' : 'Nuevo ingrediente'}</h1>
+        {ingredientId && profile?.role === 'admin' && (
+          <button
+            type="button"
+            onClick={() => void handleDeleteClick()}
+            disabled={deleteState === 'checking'}
+            className="rounded-md border border-red-300 px-3 py-2 text-sm font-medium text-red-700 disabled:opacity-50"
+          >
+            {deleteState === 'checking' ? 'Comprobando…' : 'Eliminar'}
+          </button>
+        )}
+      </div>
+
+      <ConfirmDialog
+        open={deleteState === 'blocked' || deleteState === 'confirm' || deleteState === 'deleting'}
+        title={deleteState === 'blocked' ? 'No se puede eliminar' : 'Eliminar ingrediente'}
+        description={
+          deleteState === 'blocked' && deleteBlockers ? (
+            <>
+              <p>
+                Este ingrediente no puede eliminarse porque está utilizado en {deleteBlockers.used_in_recipe_count}{' '}
+                receta{deleteBlockers.used_in_recipe_count === 1 ? '' : 's'}:
+              </p>
+              <ul className="mt-2 list-disc pl-5">
+                {deleteBlockers.used_in_recipe_names.map((recipeName) => (
+                  <li key={recipeName}>{recipeName}</li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <>
+              <p>
+                ¿Quieres eliminar &quot;{name}&quot;? Esta acción no se puede deshacer.
+              </p>
+              {deleteBlockers && deleteBlockers.purchase_format_count > 0 && (
+                <p className="mt-2">
+                  También se eliminarán sus {deleteBlockers.purchase_format_count} formato(s) de compra y su
+                  historial de precios.
+                </p>
+              )}
+            </>
+          )
+        }
+        onConfirm={deleteState === 'blocked' ? undefined : () => void handleDeleteConfirm()}
+        onCancel={handleDeleteCancel}
+        loading={deleteState === 'deleting'}
+        error={deleteError}
+      />
 
       <section className="rounded-lg border border-neutral-200 bg-white p-4">
         <h2 className="text-lg font-medium">Datos básicos</h2>

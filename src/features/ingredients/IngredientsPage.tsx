@@ -48,16 +48,29 @@ export function IngredientsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between print:hidden">
         <h1 className="text-2xl font-semibold">Ingredientes</h1>
-        {isAdmin && (
-          <Link
-            to="/ingredientes/nuevo"
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700"
           >
-            + Nuevo ingrediente
-          </Link>
-        )}
+            Imprimir listado
+          </button>
+          {isAdmin && (
+            <Link
+              to="/ingredientes/nuevo"
+              className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+            >
+              + Nuevo ingrediente
+            </Link>
+          )}
+        </div>
+      </div>
+
+      <div className="hidden print:block">
+        <h1 className="text-2xl font-semibold">Ingredientes</h1>
       </div>
 
       <input
@@ -65,10 +78,10 @@ export function IngredientsPage() {
         placeholder="Buscar ingrediente…"
         value={search}
         onChange={(event) => setSearch(event.target.value)}
-        className="w-full max-w-sm rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        className="w-full max-w-sm rounded-md border border-neutral-300 px-3 py-2 text-sm print:hidden"
       />
 
-      <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
+      <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white print:border-0">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-neutral-200 text-left text-neutral-500">

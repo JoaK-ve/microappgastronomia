@@ -56,6 +56,7 @@ Deno.serve(async (req) => {
   const email = body?.email?.trim()
   const name = body?.name?.trim()
   const role = body?.role
+  const origin = body?.origin?.trim()
 
   if (!email || !name || !VALID_ROLES.includes(role)) {
     return json({ error: 'Datos incompletos' }, 400)
@@ -69,6 +70,7 @@ Deno.serve(async (req) => {
       name,
       role,
     },
+    redirectTo: origin ? `${origin}/invitacion` : undefined,
   })
 
   if (error) {

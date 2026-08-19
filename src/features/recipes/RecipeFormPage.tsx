@@ -3,9 +3,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { RecipeComponentsSection } from '@/features/recipes/RecipeComponentsSection'
-import type { Unit } from '@/types'
+import type { RecipeCategory, Unit } from '@/types'
 
 const UNITS: Unit[] = ['g', 'kg', 'ml', 'L', 'ud']
+const CODE_PATTERN = /^REC-(\d+)$/
+
+function isUniqueViolation(error: { code?: string; message?: string } | null, constraintName: string) {
+  return error?.code === '23505' && !!error.message?.includes(constraintName)
+}
 
 export function RecipeFormPage() {
   const { id } = useParams()
@@ -18,6 +23,12 @@ export function RecipeFormPage() {
   const [category, setCategory] = useState('')
   const [code, setCode] = useState('')
   const [status, setStatus] = useState('active')
+
+  const [categories, setCategories] = useState<RecipeCategory[]>([])
+  const [showNewCategory, setShowNewCategory] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [categorySaving, setCategorySaving] = useState(false)
+  const [categoryError, setCategoryError] = useState<string | null>(null)
 
   const [steps, setSteps] = useState<string[]>([])
   const [newStep, setNewStep] = useState('')
@@ -39,6 +50,69 @@ export function RecipeFormPage() {
     if (!id) return
     void loadRecipe(id)
   }, [id])
+
+  useEffect(() => {
+    if (!profile) return
+    void loadCategories()
+  }, [profile?.business_id])
+
+  // Sugerencia automática de código, solo al crear una receta nueva (nunca
+  // al editar una existente, y nunca pisa un código ya escrito).
+  useEffect(() => {
+    if (id || !profile) return
+    void suggestCode()
+  }, [id, profile?.business_id])
+
+  async function loadCategories() {
+    const { data } = await supabase.from('recipe_categories').select('*').order('name')
+    setCategories((data as RecipeCategory[]) ?? [])
+  }
+
+  async function suggestCode() {
+    const { data } = await supabase.from('recipes').select('code').not('code', 'is', null)
+    let max = 0
+    for (const row of (data as { code: string }[]) ?? []) {
+      const match = CODE_PATTERN.exec(row.code)
+      if (match) max = Math.max(max, Number(match[1]))
+    }
+    const suggestion = `REC-${String(max + 1).padStart(3, '0')}`
+    setCode((prev) => prev || suggestion)
+  }
+
+  async function handleAddCategory() {
+    const trimmed = newCategoryName.trim()
+    if (!trimmed) {
+      setCategoryError('El nombre no puede estar vacío.')
+      return
+    }
+    if (!profile) return
+
+    setCategorySaving(true)
+    setCategoryError(null)
+
+    const { data, error: insertError } = await supabase
+      .from('recipe_categories')
+      .insert({ business_id: profile.business_id, name: trimmed })
+      .select('*')
+      .single()
+
+    setCategorySaving(false)
+
+    if (insertError || !data) {
+      if (isUniqueViolation(insertError, 'recipe_categories_business_id_lower_name_key')) {
+        setCategoryError('Ya existe una categoría con ese nombre.')
+      } else {
+        setCategoryError('No se pudo crear la categoría.')
+      }
+      return
+    }
+
+    const newCategory = data as RecipeCategory
+    setCategories((prev) => [...prev, newCategory].sort((a, b) => a.name.localeCompare(b.name)))
+    setCategory(newCategory.name)
+    setShowNewCategory(false)
+    setNewCategoryName('')
+  }
 
   async function loadRecipe(recipeIdToLoad: string) {
     setLoading(true)
@@ -97,7 +171,11 @@ export function RecipeFormPage() {
       const { error: updateError } = await supabase.from('recipes').update(payload).eq('id', recipeId)
       setSaving(false)
       if (updateError) {
-        setError('No se pudo guardar la receta.')
+        if (isUniqueViolation(updateError, 'recipes_business_id_code_key')) {
+          setError(`Ya existe una receta con el código "${code}" en este negocio. Cambia el código para guardar.`)
+        } else {
+          setError('No se pudo guardar la receta.')
+        }
         return
       }
       return
@@ -112,7 +190,11 @@ export function RecipeFormPage() {
     setSaving(false)
 
     if (insertError || !data) {
-      setError('No se pudo crear la receta.')
+      if (isUniqueViolation(insertError, 'recipes_business_id_code_key')) {
+        setError(`Ya existe una receta con el código "${code}" en este negocio. Cambia el código para guardar.`)
+      } else {
+        setError('No se pudo crear la receta.')
+      }
       return
     }
 
@@ -161,13 +243,66 @@ export function RecipeFormPage() {
                 <label htmlFor="category" className="block text-sm font-medium text-neutral-700">
                   Categoría
                 </label>
-                <input
+                <select
                   id="category"
-                  type="text"
                   value={category}
                   onChange={(event) => setCategory(event.target.value)}
                   className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
-                />
+                >
+                  <option value="">Sin categoría</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+
+                {!showNewCategory ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowNewCategory(true)}
+                    className="mt-1 text-xs font-medium text-neutral-500 hover:underline"
+                  >
+                    + Nueva categoría
+                  </button>
+                ) : (
+                  <div className="mt-1 flex gap-1">
+                    <input
+                      type="text"
+                      autoFocus
+                      placeholder="Nombre"
+                      value={newCategoryName}
+                      onChange={(event) => setNewCategoryName(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault()
+                          void handleAddCategory()
+                        }
+                      }}
+                      className="w-full min-w-0 rounded-md border border-neutral-300 px-2 py-1 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void handleAddCategory()}
+                      disabled={categorySaving}
+                      className="shrink-0 rounded-md bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700 disabled:opacity-50"
+                    >
+                      {categorySaving ? '…' : 'Añadir'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowNewCategory(false)
+                        setNewCategoryName('')
+                        setCategoryError(null)
+                      }}
+                      className="shrink-0 text-xs text-neutral-400 hover:text-neutral-700"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                )}
+                {categoryError && <p className="mt-1 text-xs text-red-600">{categoryError}</p>}
               </div>
               <div>
                 <label htmlFor="code" className="block text-sm font-medium text-neutral-700">

@@ -1,11 +1,16 @@
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
+import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { APP_VERSION_DISPLAY } from '@/lib/version'
+
+const LOGO_BUCKET = 'logos'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Inicio', end: true, adminOnly: false },
   { to: '/ingredientes', label: 'Ingredientes', end: false, adminOnly: false },
   { to: '/recetas', label: 'Recetas', end: false, adminOnly: false },
+  { to: '/escandallo', label: 'Escandallo', end: false, adminOnly: true },
   { to: '/produccion', label: 'Producción', end: false, adminOnly: false },
   { to: '/configuracion', label: 'Configuración', end: false, adminOnly: true },
 ]
@@ -13,12 +18,50 @@ const NAV_ITEMS = [
 export function AppLayout() {
   const { profile, signOut } = useAuth()
   const isAdmin = profile?.role === 'admin'
+  const [logoUrl, setLogoUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!profile?.business_id) {
+      setLogoUrl(null)
+      return
+    }
+
+    let cancelled = false
+
+    supabase
+      .from('businesses')
+      .select('logo_url')
+      .eq('id', profile.business_id)
+      .single()
+      .then(({ data }) => {
+        const path = (data as { logo_url: string | null } | null)?.logo_url
+        if (!path) {
+          if (!cancelled) setLogoUrl(null)
+          return
+        }
+        supabase.storage
+          .from(LOGO_BUCKET)
+          .createSignedUrl(path, 3600)
+          .then(({ data: signed }) => {
+            if (!cancelled) setLogoUrl(signed?.signedUrl ?? null)
+          })
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [profile?.business_id])
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
       <div className="flex min-h-screen flex-col md:flex-row">
         <nav className="flex flex-col border-b border-neutral-200 bg-white print:hidden md:w-56 md:border-b-0 md:border-r">
-          <div className="px-4 py-4 text-lg font-semibold">MicroApp Gastronómica</div>
+          <div className="flex items-center gap-2 px-4 py-4">
+            {logoUrl && (
+              <img src={logoUrl} alt="" className="h-7 w-7 shrink-0 rounded object-contain" />
+            )}
+            <span className="truncate text-lg font-semibold">MicroApp Gastronómica</span>
+          </div>
           <ul className="flex flex-row overflow-x-auto px-2 pb-2 md:flex-col md:overflow-visible md:px-2">
             {NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin).map((item) => (
               <li key={item.to} className="shrink-0">

@@ -378,6 +378,10 @@ allow_dynamic_registration = false
 # (callerClient.auth.getUser()), así que desactivarla aquí es seguro.
 verify_jwt = false
 
+[functions.delete-user]
+# Mismo motivo que invite-user.
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

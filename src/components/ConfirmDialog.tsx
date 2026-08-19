@@ -6,6 +6,7 @@ type ConfirmDialogProps = {
   title: string
   description: ReactNode
   confirmLabel?: string
+  loadingLabel?: string
   cancelLabel?: string
   /** Omit to render a single dismiss button (e.g. when the action is blocked and there's nothing to confirm). */
   onConfirm?: () => void
@@ -19,6 +20,7 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel = 'Eliminar',
+  loadingLabel = 'Eliminando…',
   cancelLabel = 'Cancelar',
   onConfirm,
   onCancel,
@@ -73,7 +75,7 @@ export function ConfirmDialog({
               disabled={loading}
               className="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
-              {loading ? 'Eliminando…' : confirmLabel}
+              {loading ? loadingLabel : confirmLabel}
             </button>
           )}
         </div>

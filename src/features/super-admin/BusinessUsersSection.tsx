@@ -215,6 +215,8 @@ function UsersTable({
             {roleTarget?.nextRole === 'admin' ? 'Administrador' : 'Cocina'}?
           </p>
         }
+        confirmLabel="Cambiar rol"
+        loadingLabel="Cambiando…"
         onConfirm={() => void handleRoleConfirm()}
         onCancel={() => {
           setRoleTarget(null)

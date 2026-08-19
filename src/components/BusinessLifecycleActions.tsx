@@ -92,6 +92,7 @@ export function BusinessLifecycleActions({
           </p>
         }
         confirmLabel={pendingAction ? ACTION_LABEL[pendingAction] : 'Confirmar'}
+        loadingLabel="Aplicando…"
         onConfirm={() => void handleConfirm()}
         onCancel={handleCancel}
         loading={loading}

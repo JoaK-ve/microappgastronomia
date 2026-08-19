@@ -51,7 +51,8 @@ export function AcceptInvitePage() {
         <div className="w-full max-w-sm rounded-lg border border-neutral-200 bg-white p-6 text-center shadow-sm">
           <h1 className="text-xl font-semibold">Enlace no válido</h1>
           <p className="mt-2 text-sm text-neutral-600">
-            El enlace de invitación no es válido o ya expiró. Pide al administrador que te invite de nuevo.
+            Este enlace no es válido o ya expiró. Si era una invitación, pide al administrador que te invite de
+            nuevo; si era para recuperar tu contraseña, pide que te la reseteen otra vez.
           </p>
         </div>
       </div>
@@ -64,8 +65,8 @@ export function AcceptInvitePage() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm space-y-4 rounded-lg border border-neutral-200 bg-white p-6 shadow-sm"
       >
-        <h1 className="text-xl font-semibold">Completa tu registro</h1>
-        <p className="text-sm text-neutral-600">Elige una contraseña para poder entrar.</p>
+        <h1 className="text-xl font-semibold">Define tu contraseña</h1>
+        <p className="text-sm text-neutral-600">Elige una contraseña nueva para continuar.</p>
 
         {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
@@ -106,7 +107,7 @@ export function AcceptInvitePage() {
           disabled={loading}
           className="w-full rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          {loading ? 'Guardando…' : 'Crear contraseña y entrar'}
+          {loading ? 'Guardando…' : 'Guardar contraseña y entrar'}
         </button>
       </form>
     </div>

@@ -387,6 +387,29 @@ function UsersList({
   const [targetUser, setTargetUser] = useState<Profile | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
+  const [resetSendingId, setResetSendingId] = useState<string | null>(null)
+  const [resetSentId, setResetSentId] = useState<string | null>(null)
+  const [resetError, setResetError] = useState<string | null>(null)
+
+  async function handleResetPassword(user: Profile) {
+    setResetSendingId(user.id)
+    setResetSentId(null)
+    setResetError(null)
+
+    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+      redirectTo: `${window.location.origin}/invitacion`,
+    })
+
+    setResetSendingId(null)
+
+    if (error) {
+      setResetError(`No se pudo enviar el correo a ${user.email}.`)
+      return
+    }
+
+    setResetSentId(user.id)
+  }
+
   function handleDeleteClick(user: Profile) {
     setTargetUser(user)
     setDeleteError(null)
@@ -427,24 +450,36 @@ function UsersList({
             <div>
               <p className="font-medium">{user.name}</p>
               <p className="text-neutral-500">{user.email}</p>
+              {resetSentId === user.id && <p className="text-xs text-green-700">Correo de reseteo enviado.</p>}
             </div>
             <div className="flex items-center gap-2">
               <span className="rounded-full bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700">
                 {user.role === 'admin' ? 'Administrador' : 'Cocina'}
               </span>
               {isAdmin && user.id !== currentUserId && (
-                <button
-                  type="button"
-                  onClick={() => handleDeleteClick(user)}
-                  className="text-xs font-medium text-red-600 hover:underline"
-                >
-                  Eliminar
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => void handleResetPassword(user)}
+                    disabled={resetSendingId === user.id}
+                    className="text-xs font-medium text-neutral-600 hover:underline disabled:opacity-50"
+                  >
+                    {resetSendingId === user.id ? 'Enviando…' : 'Resetear contraseña'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteClick(user)}
+                    className="text-xs font-medium text-red-600 hover:underline"
+                  >
+                    Eliminar
+                  </button>
+                </>
               )}
             </div>
           </li>
         ))}
       </ul>
+      {resetError && <p className="mt-2 text-xs text-red-600">{resetError}</p>}
 
       <ConfirmDialog
         open={deleteState === 'confirm' || deleteState === 'deleting'}

@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '@/features/auth/AuthContext'
+import { ChangePasswordControl } from '@/components/ChangePasswordControl'
 
 export function SuperAdminLayout() {
   const { session, signOut } = useAuth()
@@ -29,13 +30,16 @@ export function SuperAdminLayout() {
           </ul>
           <div className="mt-auto border-t border-neutral-200 px-4 py-3 text-sm">
             <p className="truncate text-neutral-500">{session?.user?.email}</p>
-            <button
-              type="button"
-              onClick={() => void signOut()}
-              className="mt-2 text-neutral-500 underline hover:text-neutral-900"
-            >
-              Cerrar sesión
-            </button>
+            <div className="mt-2 flex flex-wrap gap-3">
+              <ChangePasswordControl />
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="text-neutral-500 underline hover:text-neutral-900"
+              >
+                Cerrar sesión
+              </button>
+            </div>
           </div>
         </nav>
         <main className="flex-1 p-4 print:p-0 md:p-8">

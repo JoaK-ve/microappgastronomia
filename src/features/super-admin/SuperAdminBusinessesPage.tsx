@@ -82,7 +82,7 @@ export function SuperAdminBusinessesPage() {
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASS[effective]}`}>
                       {STATUS_LABEL[effective]}
                     </span>
-                    {effective !== 'suspended' && (
+                    {(effective === 'trial' || effective === 'grace') && (
                       <span className="ml-2 text-xs text-neutral-400">{getDaysRemaining(business, effective)}d</span>
                     )}
                   </td>

@@ -4,6 +4,44 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.5.0
+
+SA-4: Super Admin completo / administración de plataforma.
+
+- El Super Admin ya no es solo de lectura: desde `/super-admin` puede
+  editar los datos de cualquier negocio (nombre/teléfono/email/dirección/
+  logo), gestionar sus usuarios (invitar, cambiar rol admin/cocina,
+  eliminar, enviar recuperación de acceso) sin entrar como miembro de ese
+  negocio. Camino de autorización propio (RPCs nuevas + policies nuevas
+  scoped a `is_super_admin()`), no reutiliza las policies de auto-edición
+  del admin normal.
+- Condición de seguridad exigida explícitamente: **ningún negocio puede
+  quedar sin ningún ADMIN**. Degradar al último admin a Cocina o
+  eliminarlo queda rechazado por el backend (RPC `super_admin_set_user_role`
+  y la Edge Function `delete-user`), no solo por la interfaz.
+- Nueva navegación: Dashboard (conteos), Negocios, Usuarios (directorio
+  plano de toda la plataforma), Auditoría, Mi seguridad.
+- Auditoría de plataforma: tabla nueva `platform_audit_log` (editar
+  negocio, invitar, cambiar rol, eliminar, enviar recuperación — solo
+  acciones ejecutadas por Super Admin), complementaria a
+  `business_lifecycle_events` (SA-3), que sigue intacta.
+- Recuperación de acceso: nuevo enlace "¿Olvidaste tu contraseña?" en
+  `/login`, disponible para cualquier usuario (incluido el propio Super
+  Admin) — antes no existía ningún camino de autorrecuperación desde
+  fuera de la app. Usa exclusivamente el mecanismo ya existente de
+  Supabase Auth (`resetPasswordForEmail`), sin contraseñas maestras ni
+  almacenadas.
+- **Bug real encontrado y corregido durante las pruebas** (preexistente,
+  no introducido por SA-4): una invitación real por correo creaba un
+  negocio nuevo y volvía admin al invitado, en vez de unirlo al negocio y
+  rol pedidos — condición de carrera entre el INSERT y el UPDATE que
+  GoTrue hace sobre `auth.users` al invitar. Corregido con un trigger de
+  saneamiento que no toca la lógica de alta normal (ver CHANGELOG interno
+  en la migración `20260819250000`).
+- No se implementó impersonation ("entrar como este usuario") — queda
+  documentado como posible fase futura, explícitamente fuera de esta
+  tarea.
+
 ## V1.4.0
 
 IMPORT-ING-1: importador inteligente de ingredientes.

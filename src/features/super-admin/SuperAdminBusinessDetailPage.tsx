@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { BusinessLifecycleActions } from '@/components/BusinessLifecycleActions'
+import { BusinessEditForm } from '@/features/super-admin/BusinessEditForm'
+import { BusinessUsersSection } from '@/features/super-admin/BusinessUsersSection'
 import {
   getEffectiveStatus,
   getDaysRemaining,
@@ -72,7 +74,7 @@ export function SuperAdminBusinessDetailPage() {
 
   return (
     <div className="max-w-2xl space-y-4">
-      <Link to="/super-admin" className="text-sm text-neutral-500 hover:underline">
+      <Link to="/super-admin/negocios" className="text-sm text-neutral-500 hover:underline">
         ← Negocios
       </Link>
       <div className="flex flex-wrap items-center gap-3">
@@ -88,25 +90,18 @@ export function SuperAdminBusinessDetailPage() {
       </div>
 
       <section className="rounded-lg border border-neutral-200 bg-white p-4">
-        <h2 className="text-lg font-medium">Datos básicos</h2>
-        <dl className="mt-3 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
-          <div>
-            <dt className="text-neutral-500">Email</dt>
-            <dd>{business.email || '—'}</dd>
-          </div>
-          <div>
-            <dt className="text-neutral-500">Teléfono</dt>
-            <dd>{business.phone || '—'}</dd>
-          </div>
-          <div>
-            <dt className="text-neutral-500">Estado (guardado)</dt>
-            <dd>{STORED_STATUS_LABEL[business.status]}</dd>
-          </div>
-          <div>
-            <dt className="text-neutral-500">Creado</dt>
-            <dd>{formatDateTime(business.created_at)}</dd>
-          </div>
-        </dl>
+        <h2 className="text-lg font-medium">Datos del negocio</h2>
+        <p className="mt-1 text-xs text-neutral-400">
+          Creado {formatDateTime(business.created_at)} · Estado guardado: {STORED_STATUS_LABEL[business.status]}
+        </p>
+        <BusinessEditForm business={business} onSaved={() => id && loadBusiness(id)} />
+      </section>
+
+      <section className="rounded-lg border border-neutral-200 bg-white p-4">
+        <h2 className="text-lg font-medium">Usuarios</h2>
+        <div className="mt-3">
+          <BusinessUsersSection businessId={business.id} />
+        </div>
       </section>
 
       <section className="rounded-lg border border-neutral-200 bg-white p-4">

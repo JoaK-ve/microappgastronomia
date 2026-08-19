@@ -75,6 +75,12 @@ export function LoginPage() {
         </button>
 
         <p className="text-center text-sm text-neutral-500">
+          <Link to="/recuperar" className="font-medium text-neutral-900 underline">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </p>
+
+        <p className="text-center text-sm text-neutral-500">
           ¿No tienes negocio todavía?{' '}
           <Link to="/signup" className="font-medium text-neutral-900 underline">
             Crea uno

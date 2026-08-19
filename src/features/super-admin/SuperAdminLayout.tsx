@@ -2,6 +2,14 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ChangePasswordControl } from '@/components/ChangePasswordControl'
 
+const NAV_ITEMS = [
+  { to: '/super-admin', label: 'Dashboard', end: true },
+  { to: '/super-admin/negocios', label: 'Negocios', end: false },
+  { to: '/super-admin/usuarios', label: 'Usuarios', end: false },
+  { to: '/super-admin/auditoria', label: 'Auditoría', end: false },
+  { to: '/super-admin/seguridad', label: 'Mi seguridad', end: false },
+]
+
 export function SuperAdminLayout() {
   const { session, signOut } = useAuth()
 
@@ -14,19 +22,21 @@ export function SuperAdminLayout() {
             <p className="text-xs text-neutral-400">MicroApp Gastronómica</p>
           </div>
           <ul className="flex flex-row overflow-x-auto px-2 pb-2 md:flex-col md:overflow-visible md:px-2">
-            <li>
-              <NavLink
-                to="/super-admin"
-                end
-                className={({ isActive }) =>
-                  `block rounded-md px-3 py-2 text-sm font-medium ${
-                    isActive ? 'bg-neutral-900 text-white' : 'text-neutral-600 hover:bg-neutral-100'
-                  }`
-                }
-              >
-                Negocios
-              </NavLink>
-            </li>
+            {NAV_ITEMS.map((item) => (
+              <li key={item.to}>
+                <NavLink
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) =>
+                    `block rounded-md px-3 py-2 text-sm font-medium ${
+                      isActive ? 'bg-neutral-900 text-white' : 'text-neutral-600 hover:bg-neutral-100'
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              </li>
+            ))}
           </ul>
           <div className="mt-auto border-t border-neutral-200 px-4 py-3 text-sm">
             <p className="truncate text-neutral-500">{session?.user?.email}</p>

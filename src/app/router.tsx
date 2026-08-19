@@ -6,6 +6,7 @@ import { SuperAdminRoute } from '@/features/auth/SuperAdminRoute'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { SignUpPage } from '@/features/auth/SignUpPage'
 import { AcceptInvitePage } from '@/features/auth/AcceptInvitePage'
+import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage'
 import { HomePage } from '@/features/home/HomePage'
 import { IngredientsPage } from '@/features/ingredients/IngredientsPage'
 import { IngredientFormPage } from '@/features/ingredients/IngredientFormPage'
@@ -16,8 +17,12 @@ import { EscandalloPage } from '@/features/recipes/EscandalloPage'
 import { ProductionPage } from '@/features/production/ProductionPage'
 import { SettingsPage } from '@/features/settings/SettingsPage'
 import { SuperAdminLayout } from '@/features/super-admin/SuperAdminLayout'
+import { SuperAdminDashboardPage } from '@/features/super-admin/SuperAdminDashboardPage'
 import { SuperAdminBusinessesPage } from '@/features/super-admin/SuperAdminBusinessesPage'
 import { SuperAdminBusinessDetailPage } from '@/features/super-admin/SuperAdminBusinessDetailPage'
+import { SuperAdminUsersDirectoryPage } from '@/features/super-admin/SuperAdminUsersDirectoryPage'
+import { SuperAdminAuditPage } from '@/features/super-admin/SuperAdminAuditPage'
+import { SuperAdminSecurityPage } from '@/features/super-admin/SuperAdminSecurityPage'
 
 const ImportIngredientsPage = lazy(() =>
   import('@/features/ingredients/import/ImportIngredientsPage').then((m) => ({ default: m.ImportIngredientsPage })),
@@ -35,6 +40,7 @@ const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path: '/signup', element: <SignUpPage /> },
   { path: '/invitacion', element: <AcceptInvitePage /> },
+  { path: '/recuperar', element: <ForgotPasswordPage /> },
   {
     path: '/',
     element: <ProtectedRoute />,
@@ -65,8 +71,12 @@ const router = createBrowserRouter([
       {
         element: <SuperAdminLayout />,
         children: [
-          { index: true, element: <SuperAdminBusinessesPage /> },
+          { index: true, element: <SuperAdminDashboardPage /> },
+          { path: 'negocios', element: <SuperAdminBusinessesPage /> },
           { path: 'negocios/:id', element: <SuperAdminBusinessDetailPage /> },
+          { path: 'usuarios', element: <SuperAdminUsersDirectoryPage /> },
+          { path: 'auditoria', element: <SuperAdminAuditPage /> },
+          { path: 'seguridad', element: <SuperAdminSecurityPage /> },
         ],
       },
     ],

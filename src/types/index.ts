@@ -188,3 +188,13 @@ export type ImportRowResult = {
   ingredient_id: string | null
   message: string | null
 }
+
+export type PlatformAuditLogEntry = {
+  id: string
+  actor_id: string | null
+  business_id: string | null
+  target_user_id: string | null
+  action: string
+  detail: Record<string, unknown>
+  created_at: string
+}

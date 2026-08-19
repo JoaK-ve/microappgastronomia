@@ -42,15 +42,16 @@ Deno.serve(async (req) => {
     return json({ error: 'No autorizado' }, 401)
   }
 
-  const { data: callerProfile, error: profileError } = await callerClient
+  const { data: callerProfile } = await callerClient
     .from('profiles')
     .select('business_id, role')
     .eq('id', userData.user.id)
     .single()
 
-  if (profileError || !callerProfile || callerProfile.role !== 'admin') {
-    return json({ error: 'Solo un administrador puede invitar usuarios' }, 403)
-  }
+  // is_super_admin() es security definer: esta llamada funciona igual
+  // tanto si el que llama tiene fila en profiles como si no.
+  const { data: isSuperAdminData } = await callerClient.rpc('is_super_admin')
+  const isSuperAdmin = isSuperAdminData === true
 
   const body = await req.json().catch(() => null)
   const email = body?.email?.trim()
@@ -62,11 +63,37 @@ Deno.serve(async (req) => {
     return json({ error: 'Datos incompletos' }, 400)
   }
 
+  let targetBusinessId: string
+
+  if (isSuperAdmin) {
+    // El Super Admin no pertenece a ningún negocio: el destino viene
+    // explícito en el body, pero se verifica que existe de verdad antes
+    // de confiar en él (la policy "super admin select all businesses" ya
+    // permite esta consulta).
+    const requestedBusinessId = body?.business_id?.trim()
+    if (!requestedBusinessId) {
+      return json({ error: 'Falta el negocio destino' }, 400)
+    }
+    const { data: businessCheck } = await callerClient
+      .from('businesses')
+      .select('id')
+      .eq('id', requestedBusinessId)
+      .single()
+    if (!businessCheck) {
+      return json({ error: 'Negocio no encontrado' }, 404)
+    }
+    targetBusinessId = requestedBusinessId
+  } else if (callerProfile?.role === 'admin') {
+    targetBusinessId = callerProfile.business_id
+  } else {
+    return json({ error: 'Solo un administrador puede invitar usuarios' }, 403)
+  }
+
   const adminClient = createClient(supabaseUrl, serviceRoleKey)
 
   const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, {
     data: {
-      business_id: callerProfile.business_id,
+      business_id: targetBusinessId,
       name,
       role,
     },
@@ -75,6 +102,16 @@ Deno.serve(async (req) => {
 
   if (error) {
     return json({ error: error.message }, 400)
+  }
+
+  if (isSuperAdmin) {
+    await adminClient.from('platform_audit_log').insert({
+      actor_id: userData.user.id,
+      business_id: targetBusinessId,
+      target_user_id: data.user?.id ?? null,
+      action: 'user_invited',
+      detail: { email, name, role },
+    })
   }
 
   return json({ user: data.user }, 200)

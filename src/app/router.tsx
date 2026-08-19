@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { AppLayout } from '@/app/AppLayout'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
+import { SuperAdminRoute } from '@/features/auth/SuperAdminRoute'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { SignUpPage } from '@/features/auth/SignUpPage'
 import { AcceptInvitePage } from '@/features/auth/AcceptInvitePage'
@@ -13,6 +14,9 @@ import { RecipeViewPage } from '@/features/recipes/RecipeViewPage'
 import { EscandalloPage } from '@/features/recipes/EscandalloPage'
 import { ProductionPage } from '@/features/production/ProductionPage'
 import { SettingsPage } from '@/features/settings/SettingsPage'
+import { SuperAdminLayout } from '@/features/super-admin/SuperAdminLayout'
+import { SuperAdminBusinessesPage } from '@/features/super-admin/SuperAdminBusinessesPage'
+import { SuperAdminBusinessDetailPage } from '@/features/super-admin/SuperAdminBusinessDetailPage'
 
 const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -36,6 +40,19 @@ const router = createBrowserRouter([
           { path: 'escandallo', element: <EscandalloPage /> },
           { path: 'produccion', element: <ProductionPage /> },
           { path: 'configuracion', element: <SettingsPage /> },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/super-admin',
+    element: <SuperAdminRoute />,
+    children: [
+      {
+        element: <SuperAdminLayout />,
+        children: [
+          { index: true, element: <SuperAdminBusinessesPage /> },
+          { path: 'negocios/:id', element: <SuperAdminBusinessDetailPage /> },
         ],
       },
     ],

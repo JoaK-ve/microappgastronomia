@@ -2,6 +2,8 @@ export type Unit = 'g' | 'kg' | 'ml' | 'L' | 'ud'
 
 export type UserRole = 'admin' | 'kitchen'
 
+export type BusinessStatus = 'trial' | 'active' | 'expired' | 'suspended'
+
 export type Business = {
   id: string
   name: string
@@ -13,6 +15,11 @@ export type Business = {
   tax_id: string | null
   currency: string
   language: string
+  status: BusinessStatus
+  trial_started_at: string | null
+  trial_ends_at: string | null
+  activated_at: string | null
+  suspended_at: string | null
   created_at: string
   updated_at: string
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Navigate, Outlet } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { APP_VERSION_DISPLAY } from '@/lib/version'
@@ -16,7 +16,7 @@ const NAV_ITEMS = [
 ]
 
 export function AppLayout() {
-  const { profile, signOut } = useAuth()
+  const { session, profile, signOut } = useAuth()
   const isAdmin = profile?.role === 'admin'
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
 
@@ -92,6 +92,17 @@ export function AppLayout() {
       cancelled = true
     }
   }, [profile?.business_id])
+
+  // Un usuario AUTENTICADO sin perfil de negocio es (o debería ser) un
+  // Super Admin puro — nunca se le asigna un negocio automáticamente. En
+  // vez de renderizar este sidebar orientado a negocio (a medio llenar,
+  // roto), lo mandamos a su panel. SuperAdminRoute valida de verdad si lo
+  // es; si no lo es tampoco, ahí lo regresa aquí y no hay bucle real.
+  // (El chequeo de "session &&" es a propósito: sin sesión, este mismo
+  // componente se sigue usando de forma aislada en AppLayout.test.tsx.)
+  if (session && !profile) {
+    return <Navigate to="/super-admin" replace />
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">

@@ -97,7 +97,7 @@ export function PreviewTable({
                 {row.status === 'possible_duplicate' && row.matchedIngredientName && (
                   <p className="mt-1 text-xs text-amber-600">Parecido a "{row.matchedIngredientName}"</p>
                 )}
-                {row.status === 'existing' && row.matchedIngredientName && (
+                {(row.status === 'existing' || row.status === 'update') && row.matchedIngredientName && (
                   <p className="mt-1 text-xs text-blue-600">Ya existe como "{row.matchedIngredientName}"</p>
                 )}
               </td>

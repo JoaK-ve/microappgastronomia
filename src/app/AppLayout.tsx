@@ -56,11 +56,15 @@ export function AppLayout() {
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
       <div className="flex min-h-screen flex-col md:flex-row">
         <nav className="flex flex-col border-b border-neutral-200 bg-white print:hidden md:w-56 md:border-b-0 md:border-r">
-          <div className="flex items-center gap-2 px-4 py-4">
-            {logoUrl && (
-              <img src={logoUrl} alt="" className="h-7 w-7 shrink-0 rounded object-contain" />
+          <div className="px-4 py-4">
+            {logoUrl ? (
+              <>
+                <img src={logoUrl} alt="Logo del negocio" className="h-12 max-w-full object-contain" />
+                <p className="mt-1 truncate text-xs text-neutral-400">MicroApp Gastronómica</p>
+              </>
+            ) : (
+              <span className="truncate text-lg font-semibold">MicroApp Gastronómica</span>
             )}
-            <span className="truncate text-lg font-semibold">MicroApp Gastronómica</span>
           </div>
           <ul className="flex flex-row overflow-x-auto px-2 pb-2 md:flex-col md:overflow-visible md:px-2">
             {NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin).map((item) => (

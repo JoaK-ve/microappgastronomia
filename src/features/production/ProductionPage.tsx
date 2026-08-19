@@ -3,6 +3,14 @@ import { useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import type { Production, ProductionReference, Profile, Recipe } from '@/types'
 
+// Sin decimales, redondeado al múltiplo de 5 más cercano (lo que de verdad
+// se puede leer en una báscula de cocina) — nunca a 0 si el valor es > 0.
+function formatQuantity(value: number | null) {
+  if (value == null || value <= 0) return '0'
+  const rounded = Math.round(value / 5) * 5
+  return String(rounded === 0 ? 5 : rounded)
+}
+
 export function ProductionPage() {
   const [searchParams] = useSearchParams()
   const preselectedRecipeId = searchParams.get('receta')
@@ -141,7 +149,7 @@ export function ProductionPage() {
                 {reference.source === 'yield'
                   ? 'Rendimiento estándar'
                   : 'Cantidad base de la fórmula (sin rendimiento definido)'}
-                : <strong>{reference.reference_quantity} {reference.reference_unit}</strong>
+                : <strong>{formatQuantity(reference.reference_quantity)} {reference.reference_unit}</strong>
               </p>
 
               {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
@@ -213,10 +221,10 @@ export function ProductionPage() {
                     )}
                   </td>
                   <td className="py-2 pr-4 text-neutral-500">
-                    {component.original_quantity} {component.unit}
+                    {formatQuantity(component.original_quantity)} {component.unit}
                   </td>
                   <td className="py-2 font-medium">
-                    {component.scaled_quantity.toFixed(3)} {component.unit}
+                    {formatQuantity(component.scaled_quantity)} {component.unit}
                   </td>
                 </tr>
               ))}

@@ -201,7 +201,7 @@ export function RecipeComponentsSection({ recipeId, businessId }: { recipeId: st
             </option>
           ))}
         </select>
-        <button type="submit" className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white">
+        <button type="submit" className="rounded-md bg-brand-500 hover:bg-brand-600 px-3 py-1.5 text-sm font-medium text-white">
           Añadir
         </button>
       </form>

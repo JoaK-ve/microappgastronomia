@@ -69,7 +69,7 @@ export function IngredientsPage() {
           {isAdmin && (
             <Link
               to="/ingredientes/nuevo"
-              className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+              className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white"
             >
               + Nuevo ingrediente
             </Link>

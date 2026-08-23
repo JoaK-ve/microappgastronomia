@@ -108,7 +108,7 @@ export function AppLayout() {
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
       <div className="flex min-h-screen flex-col md:flex-row">
-        <nav className="flex flex-col border-b border-neutral-200 bg-white print:hidden md:w-56 md:border-b-0 md:border-r">
+        <nav className="flex flex-col border-b border-neutral-800 bg-neutral-900 text-neutral-50 print:hidden md:w-56 md:border-b-0 md:border-r">
           <div className="px-4 py-5">
             {logoUrl ? (
               <>
@@ -116,7 +116,7 @@ export function AppLayout() {
                 <p className="mt-1.5 truncate text-xs text-neutral-400">MicroApp Gastronómica</p>
               </>
             ) : (
-              <span className="truncate text-lg font-semibold">MicroApp Gastronómica</span>
+              <span className="truncate text-lg font-semibold text-brand-100">MicroApp Gastronómica</span>
             )}
           </div>
 
@@ -146,8 +146,8 @@ export function AppLayout() {
                   className={({ isActive }) =>
                     `block rounded-md px-3 py-2 text-sm font-medium ${
                       isActive
-                        ? 'bg-neutral-900 text-white'
-                        : 'text-neutral-600 hover:bg-neutral-100'
+                        ? 'bg-brand-500 text-white'
+                        : 'text-neutral-300 hover:bg-neutral-800'
                     }`
                   }
                 >
@@ -156,21 +156,21 @@ export function AppLayout() {
               </li>
             ))}
           </ul>
-          <div className="mt-auto border-t border-neutral-200 px-4 py-3 text-sm">
+          <div className="mt-auto border-t border-neutral-800 px-4 py-3 text-sm">
             <p className="truncate font-medium">{profile?.name}</p>
-            <p className="truncate text-neutral-500">{profile?.email}</p>
+            <p className="truncate text-neutral-400">{profile?.email}</p>
             <div className="mt-2 flex flex-wrap gap-3">
-              <ChangePasswordControl />
+              <ChangePasswordControl variant="dark" />
               <button
                 type="button"
                 onClick={() => void signOut()}
-                className="text-neutral-500 underline hover:text-neutral-900"
+                className="text-neutral-400 underline hover:text-white"
               >
                 Cerrar sesión
               </button>
             </div>
           </div>
-          <p className="border-t border-neutral-200 px-4 py-2 text-right text-xs text-neutral-400">
+          <p className="border-t border-neutral-800 px-4 py-2 text-right text-xs text-neutral-500">
             {APP_VERSION_DISPLAY}
           </p>
         </nav>

@@ -167,7 +167,7 @@ export function PurchaseFormatsSection({ ingredientId, businessId }: { ingredien
           onChange={(event) => setPriceDate(event.target.value)}
           className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
         />
-        <button type="submit" className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white">
+        <button type="submit" className="rounded-md bg-brand-500 hover:bg-brand-600 px-3 py-1.5 text-sm font-medium text-white">
           Añadir
         </button>
       </form>

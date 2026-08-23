@@ -65,7 +65,7 @@ export function RecipesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Recetas</h1>
-        <Link to="/recetas/nueva" className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
+        <Link to="/recetas/nueva" className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white">
           + Nueva receta
         </Link>
       </div>

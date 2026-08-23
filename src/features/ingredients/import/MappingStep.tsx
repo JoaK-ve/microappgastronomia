@@ -91,7 +91,7 @@ export function MappingStep({ table, mapping, onChange, onBack, onContinue }: Pr
           type="button"
           disabled={missingRequired.length > 0}
           onClick={onContinue}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
           Continuar
         </button>

@@ -244,7 +244,7 @@ export function IngredientFormPage() {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
           >
             {saving ? 'Guardando…' : ingredientId ? 'Guardar cambios' : 'Crear ingrediente'}
           </button>

@@ -208,7 +208,7 @@ export function ImportIngredientsPage() {
             <button
               type="button"
               onClick={() => proceedToMapping(parsedSource.sheets[selectedSheet].table)}
-              className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+              className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white"
             >
               Continuar
             </button>
@@ -255,7 +255,7 @@ export function ImportIngredientsPage() {
               type="button"
               disabled={approvedRows.length === 0}
               onClick={() => setStep('confirm')}
-              className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+              className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
               Continuar
             </button>
@@ -290,7 +290,7 @@ export function ImportIngredientsPage() {
             <button
               type="button"
               onClick={() => void handleConfirmImport()}
-              className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+              className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white"
             >
               Confirmar importación
             </button>
@@ -302,7 +302,7 @@ export function ImportIngredientsPage() {
         <div className="max-w-md space-y-3">
           <h1 className="text-2xl font-semibold">Importando…</h1>
           <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-200">
-            <div className={`h-full w-1/2 bg-neutral-900 ${importing ? 'animate-pulse' : ''}`} />
+            <div className={`h-full w-1/2 bg-brand-500 ${importing ? 'animate-pulse' : ''}`} />
           </div>
           <p className="text-sm text-neutral-500">Escribiendo los ingredientes aprobados…</p>
         </div>
@@ -334,7 +334,7 @@ export function ImportIngredientsPage() {
           <button
             type="button"
             onClick={() => navigate('/ingredientes')}
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+            className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white"
           >
             Ver ingredientes
           </button>

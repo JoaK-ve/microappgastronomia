@@ -4,6 +4,23 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.5.1
+
+Identidad visual "cálida, tipo restaurante" (terracota + crema) en la app principal.
+
+- Nueva paleta de marca: fondo crema, sidebar en marrón oscuro, terracota
+  como único color de acento (botones primarios, elemento de navegación
+  activo). Definida de forma centralizada en `src/index.css`
+  (redefine la escala `neutral` de Tailwind + nueva escala `brand`), no
+  archivo por archivo — así toda la app principal (Login, Registro,
+  Recuperar contraseña, Inicio, Ingredientes, Recetas, Producción,
+  Escandallo, Configuración, importador) queda coherente de una sola vez.
+- `ChangePasswordControl` gana una variante `dark` para verse bien tanto
+  en el sidebar oscuro de la app principal como en el panel de Super
+  Admin (que de momento mantiene su estilo anterior, a propósito).
+- El panel de Super Admin **no se tocó en esta pasada** — se acordó
+  empezar por la app principal; su turno visual llega después.
+
 ## V1.5.0
 
 SA-4: Super Admin completo / administración de plataforma.

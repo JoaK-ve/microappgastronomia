@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+/*
+ * Paleta "cálida, tipo restaurante" (terracota + crema), aprobada
+ * 2026-08-20 a partir de mockups. Redefine la escala "neutral" por
+ * completo (en vez de crear una escala nueva) para que toda la app
+ * herede el tono cálido sin tener que tocar cada uso existente de las
+ * utilidades neutral-* (fondos, bordes, texto) archivo por archivo.
+ * "brand" es la escala terracota, reservada para acciones primarias
+ * (botones, estado activo de navegación) — nunca para texto de cuerpo
+ * ni fondos grandes.
+ */
+@theme {
+  --color-neutral-50: #fbf3ec;
+  --color-neutral-100: #f3e1d0;
+  --color-neutral-200: #ead9c8;
+  --color-neutral-300: #d9ae87;
+  --color-neutral-400: #bfa089;
+  --color-neutral-500: #8a6a53;
+  --color-neutral-600: #6b5240;
+  --color-neutral-700: #5a4433;
+  --color-neutral-800: #4a3226;
+  --color-neutral-900: #3a2418;
+  --color-neutral-950: #2a1a10;
+
+  --color-brand-50: #fbeee5;
+  --color-brand-100: #f6d9c8;
+  --color-brand-200: #ecb495;
+  --color-brand-300: #de8f68;
+  --color-brand-400: #d06f45;
+  --color-brand-500: #c1502b;
+  --color-brand-600: #a03d1e;
+  --color-brand-700: #7a3b1e;
+  --color-brand-800: #5c2c16;
+  --color-brand-900: #3f1e0f;
+}

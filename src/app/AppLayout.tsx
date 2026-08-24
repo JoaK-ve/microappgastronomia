@@ -1,29 +1,55 @@
-import { useEffect, useState } from 'react'
-import { NavLink, Navigate, Outlet } from 'react-router-dom'
+import { useEffect, useState, type ComponentType, type SVGProps } from 'react'
+import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ChangePasswordControl } from '@/components/ChangePasswordControl'
 import { APP_VERSION_DISPLAY } from '@/lib/version'
 import { getDaysRemaining, getEffectiveStatus, type EffectiveStatus } from '@/lib/businessLifecycle'
+import { IconBook, IconCalculator, IconGear, IconHome, IconLeaf, IconMore, IconPot } from '@/components/icons/NavIcons'
 import type { Business } from '@/types'
 
 const LOGO_BUCKET = 'logos'
 
-const NAV_ITEMS = [
-  { to: '/', label: 'Inicio', end: true, adminOnly: false },
-  { to: '/ingredientes', label: 'Ingredientes', end: false, adminOnly: false },
-  { to: '/recetas', label: 'Recetas', end: false, adminOnly: false },
-  { to: '/escandallo', label: 'Escandallo', end: false, adminOnly: true },
-  { to: '/produccion', label: 'Producción', end: false, adminOnly: false },
-  { to: '/configuracion', label: 'Configuración', end: false, adminOnly: true },
+type NavItem = {
+  to: string
+  label: string
+  end: boolean
+  adminOnly: boolean
+  icon: ComponentType<SVGProps<SVGSVGElement>>
+  mobilePrimary: boolean
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { to: '/', label: 'Inicio', end: true, adminOnly: false, icon: IconHome, mobilePrimary: true },
+  { to: '/ingredientes', label: 'Ingredientes', end: false, adminOnly: false, icon: IconLeaf, mobilePrimary: true },
+  { to: '/recetas', label: 'Recetas', end: false, adminOnly: false, icon: IconBook, mobilePrimary: true },
+  { to: '/escandallo', label: 'Escandallo', end: false, adminOnly: true, icon: IconCalculator, mobilePrimary: false },
+  { to: '/produccion', label: 'Producción', end: false, adminOnly: false, icon: IconPot, mobilePrimary: true },
+  { to: '/configuracion', label: 'Configuración', end: false, adminOnly: true, icon: IconGear, mobilePrimary: false },
 ]
+
+const DESKTOP_LINK_CLASS = ({ isActive }: { isActive: boolean }) =>
+  `flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium ${
+    isActive ? 'bg-brand-500 text-white' : 'text-neutral-300 hover:bg-neutral-800'
+  }`
+
+const MOBILE_TAB_CLASS = ({ isActive }: { isActive: boolean }) =>
+  `flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium ${
+    isActive ? 'text-brand-400' : 'text-neutral-400'
+  }`
 
 export function AppLayout() {
   const { session, profile, signOut } = useAuth()
+  const location = useLocation()
   const isAdmin = profile?.role === 'admin'
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [effectiveStatus, setEffectiveStatus] = useState<EffectiveStatus | null>(null)
   const [daysRemaining, setDaysRemaining] = useState(0)
+  const [moreOpen, setMoreOpen] = useState(false)
+
+  useEffect(() => {
+    setMoreOpen(false)
+  }, [location.pathname])
 
   useEffect(() => {
     if (!profile?.business_id) {
@@ -105,10 +131,18 @@ export function AppLayout() {
     )
   }
 
+  const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin)
+  const primaryItems = visibleItems.filter((item) => item.mobilePrimary)
+  const moreItems = visibleItems.filter((item) => !item.mobilePrimary)
+  const hasMoreItems = moreItems.length > 0
+
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
       <div className="flex min-h-screen flex-col md:flex-row">
-        <nav className="flex flex-col border-b border-neutral-800 bg-neutral-900 text-neutral-50 print:hidden md:w-56 md:border-b-0 md:border-r">
+        <nav
+          aria-label="Navegación principal"
+          className="flex flex-col border-b border-neutral-800 bg-neutral-900 text-neutral-50 print:hidden md:w-56 md:border-b-0 md:border-r"
+        >
           <div className="px-4 py-3 md:py-5">
             {logoUrl ? (
               <>
@@ -137,25 +171,18 @@ export function AppLayout() {
             </div>
           )}
 
-          <ul className="flex flex-row overflow-x-auto px-2 pb-2 md:flex-col md:overflow-visible md:px-2">
-            {NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin).map((item) => (
-              <li key={item.to} className="shrink-0">
-                <NavLink
-                  to={item.to}
-                  end={item.end}
-                  className={({ isActive }) =>
-                    `block rounded-md px-3 py-2 text-sm font-medium ${
-                      isActive
-                        ? 'bg-brand-500 text-white'
-                        : 'text-neutral-300 hover:bg-neutral-800'
-                    }`
-                  }
-                >
+          {/* Navegación completa: solo escritorio. En móvil vive en la barra inferior. */}
+          <ul className="hidden flex-col gap-0.5 px-2 md:flex">
+            {visibleItems.map((item) => (
+              <li key={item.to}>
+                <NavLink to={item.to} end={item.end} className={DESKTOP_LINK_CLASS}>
+                  <item.icon className="h-4.5 w-4.5 shrink-0" />
                   {item.label}
                 </NavLink>
               </li>
             ))}
           </ul>
+
           <div className="mt-auto border-t border-neutral-800 px-4 py-3 text-sm">
             <p className="hidden truncate font-medium md:block">{profile?.name}</p>
             <p className="hidden truncate text-neutral-400 md:block">{profile?.email}</p>
@@ -174,9 +201,74 @@ export function AppLayout() {
             {APP_VERSION_DISPLAY}
           </p>
         </nav>
-        <main className="flex-1 p-4 print:p-0 md:p-8">
+
+        <main className="flex-1 p-4 pb-24 print:p-0 md:p-8 md:pb-8">
           <Outlet />
         </main>
+
+        {/* Barra inferior: solo móvil/tablet estrecho. */}
+        <nav
+          aria-label="Navegación móvil"
+          className="fixed inset-x-0 bottom-0 z-40 flex border-t border-neutral-800 bg-neutral-900 pb-[env(safe-area-inset-bottom)] print:hidden md:hidden"
+        >
+          {primaryItems.map((item) => (
+            <NavLink key={item.to} to={item.to} end={item.end} className={MOBILE_TAB_CLASS}>
+              <item.icon className="h-5.5 w-5.5" />
+              {item.label}
+            </NavLink>
+          ))}
+          {hasMoreItems && (
+            <button
+              type="button"
+              onClick={() => setMoreOpen((v) => !v)}
+              className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium ${
+                moreOpen ? 'text-brand-400' : 'text-neutral-400'
+              }`}
+            >
+              <IconMore className="h-5.5 w-5.5" />
+              Más
+            </button>
+          )}
+        </nav>
+
+        {moreOpen && (
+          <div
+            role="presentation"
+            className="fixed inset-0 z-30 bg-neutral-900/40 md:hidden"
+            onClick={() => setMoreOpen(false)}
+          >
+            <div
+              className="absolute inset-x-0 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] rounded-t-xl border-t border-neutral-200 bg-white p-2 shadow-lg"
+              onClick={(event) => event.stopPropagation()}
+            >
+              {moreItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium ${
+                      isActive ? 'bg-brand-50 text-brand-700' : 'text-neutral-700'
+                    }`
+                  }
+                >
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  {item.label}
+                </NavLink>
+              ))}
+              <div className="mt-1 border-t border-neutral-100 px-3 py-2.5 text-sm text-neutral-700">
+                <ChangePasswordControl />
+              </div>
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="w-full rounded-md px-3 py-2.5 text-left text-sm font-medium text-red-600"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

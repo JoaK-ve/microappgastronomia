@@ -4,6 +4,26 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.6.0
+
+Navegación con iconos, y barra inferior propia en móvil/tablet.
+
+- Cada sección (Inicio, Ingredientes, Recetas, Escandallo, Producción,
+  Configuración) tiene ahora un icono propio (SVG, sin dependencias),
+  visible tanto en el sidebar de escritorio como en móvil.
+- En escritorio: mismo sidebar de siempre, ahora con icono + etiqueta.
+- En móvil/tablet (por debajo de `md`): la navegación ya no vive en una
+  fila de píldoras arriba — pasa a una barra fija abajo con Inicio,
+  Ingredientes, Recetas y Producción. Escandallo y Configuración (ambas
+  solo admin) junto con Cambiar contraseña y Cerrar sesión se agrupan
+  bajo un quinto botón "Más", que abre un panel encima de la barra.
+- Efecto secundario positivo: al quitar la fila de navegación de arriba,
+  la franja superior en móvil baja de 202px a 158px de alto.
+- Existen ahora dos `<nav>` en el DOM (uno por tamaño, alternados por
+  CSS) — cada uno con su propio `aria-label` ("Navegación principal" /
+  "Navegación móvil") para que no se confundan entre sí ni para
+  lectores de pantalla ni para tests.
+
 ## V1.5.3
 
 Mismo arreglo de móvil que V1.5.2, aplicado al sidebar del Super Admin.

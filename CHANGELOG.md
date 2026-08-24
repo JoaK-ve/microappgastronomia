@@ -4,6 +4,19 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.5.3
+
+Mismo arreglo de móvil que V1.5.2, aplicado al sidebar del Super Admin.
+
+- Medido igual que en la app principal: en 375×812 el sidebar de
+  `/super-admin` ocupaba 222px (27% de la pantalla) antes de mostrar
+  contenido. El email de la cuenta pasa a ser solo de escritorio
+  (`md:block`); "Cambiar contraseña" y "Cerrar sesión" siguen
+  alcanzables en ambos tamaños. Baja a 178px (22%).
+- El Super Admin sigue sin recibir la paleta cálida (terracota/crema) —
+  esto es solo la corrección de móvil, la identidad visual sigue
+  pendiente como fase aparte.
+
 ## V1.5.2
 
 Corrección de móvil: el sidebar ocupaba más de un tercio de la pantalla.

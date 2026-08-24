@@ -17,7 +17,7 @@ export function SuperAdminLayout() {
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
       <div className="flex min-h-screen flex-col md:flex-row">
         <nav className="flex flex-col border-b border-neutral-200 bg-white print:hidden md:w-56 md:border-b-0 md:border-r">
-          <div className="px-4 py-5">
+          <div className="px-4 py-3 md:py-5">
             <span className="text-lg font-semibold">Super Admin</span>
             <p className="text-xs text-neutral-400">MicroApp Gastronómica</p>
           </div>
@@ -39,8 +39,8 @@ export function SuperAdminLayout() {
             ))}
           </ul>
           <div className="mt-auto border-t border-neutral-200 px-4 py-3 text-sm">
-            <p className="truncate text-neutral-500">{session?.user?.email}</p>
-            <div className="mt-2 flex flex-wrap gap-3">
+            <p className="hidden truncate text-neutral-500 md:block">{session?.user?.email}</p>
+            <div className="flex flex-wrap gap-3 md:mt-2">
               <ChangePasswordControl />
               <button
                 type="button"

@@ -84,3 +84,12 @@ export function IconMore(props: IconProps) {
     </svg>
   )
 }
+
+export function IconUser(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="12" cy="8" r="3.3" />
+      <path d="M5 20c1-4 4.5-6 7-6s6 2 7 6" />
+    </svg>
+  )
+}

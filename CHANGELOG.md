@@ -4,6 +4,18 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.6.1
+
+Ajuste pedido tras V1.6.0: la barra inferior de móvil se desliza en vez de agrupar bajo "Más".
+
+- Los 6 iconos de navegación (Inicio, Ingredientes, Recetas, Escandallo,
+  Producción, Configuración) van todos en la misma barra inferior, que
+  se desliza horizontalmente cuando no caben — ya no se agrupan dos
+  detrás de un botón "Más".
+- Se añade un séptimo icono "Cuenta" (siempre visible/alcanzable) que
+  abre un panel mínimo con Cambiar contraseña y Cerrar sesión — antes
+  vivía mezclado con Escandallo/Configuración dentro de "Más".
+
 ## V1.6.0
 
 Navegación con iconos, y barra inferior propia en móvil/tablet.

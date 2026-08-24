@@ -109,10 +109,10 @@ export function AppLayout() {
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
       <div className="flex min-h-screen flex-col md:flex-row">
         <nav className="flex flex-col border-b border-neutral-800 bg-neutral-900 text-neutral-50 print:hidden md:w-56 md:border-b-0 md:border-r">
-          <div className="px-4 py-5">
+          <div className="px-4 py-3 md:py-5">
             {logoUrl ? (
               <>
-                <img src={logoUrl} alt="Logo del negocio" className="h-16 max-w-full object-contain" />
+                <img src={logoUrl} alt="Logo del negocio" className="h-12 max-w-full object-contain md:h-16" />
                 <p className="mt-1.5 truncate text-xs text-neutral-400">MicroApp Gastronómica</p>
               </>
             ) : (
@@ -157,9 +157,9 @@ export function AppLayout() {
             ))}
           </ul>
           <div className="mt-auto border-t border-neutral-800 px-4 py-3 text-sm">
-            <p className="truncate font-medium">{profile?.name}</p>
-            <p className="truncate text-neutral-400">{profile?.email}</p>
-            <div className="mt-2 flex flex-wrap gap-3">
+            <p className="hidden truncate font-medium md:block">{profile?.name}</p>
+            <p className="hidden truncate text-neutral-400 md:block">{profile?.email}</p>
+            <div className="flex flex-wrap gap-3 md:mt-2">
               <ChangePasswordControl variant="dark" />
               <button
                 type="button"
@@ -170,7 +170,7 @@ export function AppLayout() {
               </button>
             </div>
           </div>
-          <p className="border-t border-neutral-800 px-4 py-2 text-right text-xs text-neutral-500">
+          <p className="hidden border-t border-neutral-800 px-4 py-2 text-right text-xs text-neutral-500 md:block">
             {APP_VERSION_DISPLAY}
           </p>
         </nav>

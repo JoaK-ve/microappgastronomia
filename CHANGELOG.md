@@ -4,6 +4,20 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.5.2
+
+Corrección de móvil: el sidebar ocupaba más de un tercio de la pantalla.
+
+- En móvil, la barra lateral (ahora oscura desde V1.5.1) mostraba nombre,
+  email, versión de la app y todo el resto del contenido antes de llegar
+  a la pantalla real — 299px de 812px de alto, solo de "cromo".
+- Nombre/email y la línea de versión pasan a ser solo de escritorio
+  (`md:block`) — decorativos, no esenciales en el móvil. "Cambiar
+  contraseña" y "Cerrar sesión" siguen alcanzables en ambos tamaños.
+- Logo/marca con menos padding vertical en móvil.
+- Resultado: la barra baja de 299px a 202px de alto en un viewport de
+  375×812 — el contenido aparece mucho antes al entrar desde el móvil.
+
 ## V1.5.1
 
 Identidad visual "cálida, tipo restaurante" (terracota + crema) en la app principal.

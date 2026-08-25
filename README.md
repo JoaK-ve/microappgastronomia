@@ -7,7 +7,7 @@ Especificación funcional: Documento Maestro — MicroApp Gastronómica V0.4.
 
 ## Versión actual
 
-**V1.6.1**
+**V1.6.2**
 
 Esquema `VMAJOR.MINOR.PATCH` (versión de la **aplicación**, no de las
 recetas — son conceptos independientes; la versión de cada receta vive
@@ -116,6 +116,6 @@ ejecución, nunca en el bundle del cliente).
 
 ## Estado
 
-V1.6.1 — funcional, desplegable, en producción en Cloudflare Pages. Ver
+V1.6.2 — funcional, desplegable, en producción en Cloudflare Pages. Ver
 [`CHANGELOG.md`](./CHANGELOG.md) para el detalle de qué incluye, y el
 historial de commits para el desarrollo por fases.

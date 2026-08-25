@@ -4,6 +4,28 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.6.2
+
+Dashboard de Super Admin interactivo (a petición del usuario: "no hay ningún tipo de interacción con las tarjetas").
+
+- Las tarjetas de conteo ahora son clicables: "Negocios" y "Vencen
+  pronto" llevan al listado de negocios, "Usuarios totales" al
+  directorio de usuarios.
+- Nueva tarjeta "⚠️ Vencen pronto": negocios en trial/gracia con 3 días
+  o menos restantes, para poder contactarlos antes de que se suspendan
+  solos.
+- Nueva sección "Negocios recientes": los 5 negocios más nuevos, con
+  usuarios/ingredientes reales y estado, cada fila clicable a su ficha.
+- Nueva sección "Actividad reciente": últimas 5 acciones de plataforma
+  (auditoría + cambios de ciclo de vida), cada una clicable al negocio
+  afectado, con tiempo relativo ("hace 2 h", "ayer").
+- **Bug real encontrado y corregido durante la verificación**: el
+  conteo de ingredientes por negocio daba 0 para todos, incluidos
+  negocios con datos reales — el Super Admin nunca tuvo permiso de
+  lectura (RLS) sobre `ingredients`, solo sobre `businesses`/`profiles`.
+  Nueva policy aditiva `super admin select all ingredients` (mismo
+  patrón que las ya existentes para businesses/profiles, sólo lectura).
+
 ## V1.6.1
 
 Ajuste pedido tras V1.6.0: la barra inferior de móvil se desliza en vez de agrupar bajo "Más".

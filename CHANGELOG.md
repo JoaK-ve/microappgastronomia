@@ -4,6 +4,19 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.6.4
+
+Mismo tratamiento visual para los otros dos correos de auth reales: confirmación de registro y recuperar contraseña.
+
+- Nuevas plantillas `supabase/templates/confirmation.html` y
+  `supabase/templates/recovery.html`, mismo estilo que la de invitación
+  (V1.6.3): fondo crema, cabecera terracota oscura, botón de acento,
+  texto en español.
+- Documentadas en `config.toml` (`[auth.email.template.confirmation]`,
+  `[auth.email.template.recovery]`). Misma limitación que la de
+  invitación: no se aplican solas a producción, se pegan a mano en el
+  Dashboard hasta reconciliar `site_url`.
+
 ## V1.6.3
 
 Plantilla propia para el correo de invitación (a petición del usuario, tras ver el correo genérico de Supabase: "es terrible").

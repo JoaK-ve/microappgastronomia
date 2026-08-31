@@ -243,10 +243,17 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# Uncomment to customize email template
-# [auth.email.template.invite]
-# subject = "You have been invited"
-# content_path = "./supabase/templates/invite.html"
+# Plantilla de invitación con la identidad visual de OídoChef (terracota/crema).
+# NOTA: esto solo aplica a `supabase start` (desarrollo local) y a un futuro
+# `supabase config push`. Producción usa el proyecto Supabase real, que se
+# configura aparte desde el Dashboard (Authentication > Email Templates) —
+# `config push` no se ha ejecutado nunca contra este proyecto porque subiría
+# también `site_url` (arriba, apunta a localhost) y rompería los enlaces de
+# los correos de auth en producción. Hasta que se reconcilie ese valor con
+# producción, la plantilla de abajo se pega a mano en el Dashboard.
+[auth.email.template.invite]
+subject = "Te han invitado a OídoChef"
+content_path = "./supabase/templates/invite.html"
 
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]

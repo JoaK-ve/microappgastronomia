@@ -4,6 +4,23 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.6.3
+
+Plantilla propia para el correo de invitación (a petición del usuario, tras ver el correo genérico de Supabase: "es terrible").
+
+- Nueva plantilla `supabase/templates/invite.html`: identidad visual de
+  OídoChef (fondo crema, cabecera terracota oscura, botón de acento
+  `#c1502b`), texto en español, saludo personalizado con
+  `{{ .Data.name }}` cuando está disponible.
+- Documentada en `config.toml` (`[auth.email.template.invite]`) para
+  `supabase start` en local y para un futuro `supabase config push`.
+- **No aplicada aún a producción de forma automática**: `config push`
+  subiría todo `config.toml`, incluido `site_url` (que localmente
+  apunta a `localhost` y nunca se reconcilió con producción) — hacerlo
+  ahora rompería los enlaces de los correos de auth reales. Hasta que
+  se resuelva ese valor, la plantilla se pega a mano en el Dashboard
+  (Authentication > Email Templates > Invite user).
+
 ## V1.6.2
 
 Dashboard de Super Admin interactivo (a petición del usuario: "no hay ningún tipo de interacción con las tarjetas").

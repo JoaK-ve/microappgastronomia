@@ -4,6 +4,18 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.7.0
+
+Nueva sección "Panadería" — recetas de panadería en formato de porcentaje panadero (fórmula profesional real, a partir de una hoja de cálculo del negocio "La Esquina Caliente" con ~40 fórmulas reales de pan/repostería).
+
+- Nuevo ítem de navegación "Panadería", separado de "Recetas" pero reutilizando exactamente el mismo motor de costes y de producción — sin motor nuevo, sin RPC nueva.
+- Cada ingrediente de una receta de panadería puede marcarse "harina base" (puede repartirse entre varias filas, ej. dos tipos de harina); la suma de esos % define el 100% de referencia. El resto de ingredientes son % de esa misma base.
+- Inputs de **Paston** (peso por pieza, g) y **Cantidad** (piezas a producir) en la propia receta: de ahí se calculan automáticamente los gramos reales de cada ingrediente, que se guardan en las mismas columnas `quantity`/`unit` que usa el alta manual normal.
+- Nuevas columnas `recipes.is_bakery`/`paston_grams`/`paston_quantity` y `recipe_components.is_flour_base`/`flour_percent` (todas opcionales — las recetas existentes no se ven afectadas).
+- **23 ingredientes de panadería importados** para La Esquina Caliente (Harina Heredia, H. La Estampa, Masa Madre, Levadura fresca/instantánea, etc.), extraídos por estructura de la hoja real del negocio — 6 ya existían y se reutilizaron en vez de duplicarse (Azúcar, Sal, Orégano, Harina de trigo, Leche, Huevo mediano). Precios dejados sin definir a propósito (decisión del usuario) — se cargan desde la app cuando estén disponibles.
+- Se agregó la equivalencia gramos↔litros (1000g = 1L) para "Agua (panadería)", necesaria porque el % panadero calcula todo en masa pero esa ingrediente usa unidad de volumen.
+- Verificado en producción (cuenta desechable, datos de prueba eliminados al terminar): fórmula real "Pan Blanco de Aceitunas" reproducida exacta (mismos gramos que la hoja original), coste por componente, ficha, producción y aislamiento entre listas "Recetas"/"Panadería" — todo correcto.
+
 ## V1.6.4
 
 Mismo tratamiento visual para los otros dos correos de auth reales: confirmación de registro y recuperar contraseña.

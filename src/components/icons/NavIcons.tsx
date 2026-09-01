@@ -66,6 +66,17 @@ export function IconPot(props: IconProps) {
   )
 }
 
+export function IconWheat(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 21V4" />
+      <path d="M12 5c-2.2 0-3.5-1.3-3.5-3M12 5c2.2 0 3.5-1.3 3.5-3" />
+      <path d="M12 9c-2.2 0-3.5-1.3-3.5-3M12 9c2.2 0 3.5-1.3 3.5-3" />
+      <path d="M12 13c-2.2 0-3.5-1.3-3.5-3M12 13c2.2 0 3.5-1.3 3.5-3" />
+    </svg>
+  )
+}
+
 export function IconGear(props: IconProps) {
   return (
     <svg {...base(props)}>

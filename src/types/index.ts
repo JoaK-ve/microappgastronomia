@@ -95,6 +95,9 @@ export type Recipe = {
   conservation_temperature: string | null
   conservation_shelf_life: string | null
   conservation_notes: string | null
+  is_bakery: boolean
+  paston_grams: number | null
+  paston_quantity: number | null
   created_at: string
   updated_at: string
 }
@@ -110,6 +113,8 @@ export type RecipeComponent = {
   quantity: number
   unit: Unit
   position: number
+  is_flour_base: boolean
+  flour_percent: number | null
 }
 
 export type RecipeCost = {

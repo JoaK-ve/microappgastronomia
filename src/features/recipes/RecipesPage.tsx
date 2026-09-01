@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
+import { bakeryBasePath, useBakeryMode } from '@/features/recipes/useBakeryMode'
 import type { Recipe, RecipeCost } from '@/types'
 
 function formatYield(recipe: Recipe) {
@@ -23,6 +24,8 @@ function formatCost(cost: RecipeCost | undefined) {
 export function RecipesPage() {
   const { profile } = useAuth()
   const isAdmin = profile?.role === 'admin'
+  const bakery = useBakeryMode()
+  const basePath = bakeryBasePath(bakery)
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [costs, setCosts] = useState<Record<string, RecipeCost>>({})
   const [search, setSearch] = useState('')
@@ -30,11 +33,11 @@ export function RecipesPage() {
 
   useEffect(() => {
     void loadRecipes()
-  }, [isAdmin])
+  }, [isAdmin, bakery])
 
   async function loadRecipes() {
     setLoading(true)
-    const { data } = await supabase.from('recipes').select('*').order('name')
+    const { data } = await supabase.from('recipes').select('*').eq('is_bakery', bakery).order('name')
     setRecipes((data as Recipe[]) ?? [])
 
     if (isAdmin) {
@@ -64,9 +67,9 @@ export function RecipesPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Recetas</h1>
-        <Link to="/recetas/nueva" className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white">
-          + Nueva receta
+        <h1 className="text-2xl font-semibold">{bakery ? 'Panadería' : 'Recetas'}</h1>
+        <Link to={`${basePath}/nueva`} className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white">
+          + Nueva receta{bakery ? ' de panadería' : ''}
         </Link>
       </div>
 
@@ -93,7 +96,7 @@ export function RecipesPage() {
             {filtered.map((recipe) => (
               <tr key={recipe.id} className="border-b border-neutral-100 last:border-0">
                 <td className="px-4 py-2">
-                  <Link to={`/recetas/${recipe.id}`} className="font-medium text-neutral-900 hover:underline">
+                  <Link to={`${basePath}/${recipe.id}`} className="font-medium text-neutral-900 hover:underline">
                     {recipe.name}
                   </Link>
                 </td>
@@ -108,7 +111,7 @@ export function RecipesPage() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={isAdmin ? 5 : 4} className="px-4 py-6 text-center text-neutral-400">
-                  No hay recetas todavía.
+                  {bakery ? 'No hay recetas de panadería todavía.' : 'No hay recetas todavía.'}
                 </td>
               </tr>
             )}

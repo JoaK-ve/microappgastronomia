@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { RecipeComponentsSection } from '@/features/recipes/RecipeComponentsSection'
+import { BakeryComponentsSection } from '@/features/recipes/BakeryComponentsSection'
+import { bakeryBasePath, useBakeryMode } from '@/features/recipes/useBakeryMode'
 import type { RecipeCategory, Unit } from '@/types'
 
 const UNITS: Unit[] = ['g', 'kg', 'ml', 'L', 'ud']
@@ -16,6 +18,8 @@ export function RecipeFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { profile } = useAuth()
+  const bakery = useBakeryMode()
+  const basePath = bakeryBasePath(bakery)
 
   const [recipeId, setRecipeId] = useState<string | null>(id ?? null)
 
@@ -183,7 +187,7 @@ export function RecipeFormPage() {
 
     const { data, error: insertError } = await supabase
       .from('recipes')
-      .insert({ ...payload, business_id: profile.business_id })
+      .insert({ ...payload, business_id: profile.business_id, is_bakery: bakery })
       .select('id')
       .single()
 
@@ -199,7 +203,7 @@ export function RecipeFormPage() {
     }
 
     setRecipeId(data.id)
-    navigate(`/recetas/${data.id}/editar`, { replace: true })
+    navigate(`${basePath}/${data.id}/editar`, { replace: true })
   }
 
   if (loading) {
@@ -213,11 +217,14 @@ export function RecipeFormPage() {
   return (
     <div className="max-w-2xl space-y-6">
       {recipeId && (
-        <Link to={`/recetas/${recipeId}`} className="text-sm text-neutral-500 hover:underline">
+        <Link to={`${basePath}/${recipeId}`} className="text-sm text-neutral-500 hover:underline">
           ← Ver ficha
         </Link>
       )}
-      <h1 className="text-2xl font-semibold">{recipeId ? 'Editar receta' : 'Nueva receta'}</h1>
+      <h1 className="text-2xl font-semibold">
+        {recipeId ? 'Editar receta' : 'Nueva receta'}
+        {bakery ? ' de panadería' : ''}
+      </h1>
 
       <div className="space-y-6">
         {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
@@ -334,7 +341,12 @@ export function RecipeFormPage() {
           </div>
         </section>
 
-        {recipeId && profile && <RecipeComponentsSection recipeId={recipeId} businessId={profile.business_id} />}
+        {recipeId && profile && bakery && (
+          <BakeryComponentsSection recipeId={recipeId} businessId={profile.business_id} />
+        )}
+        {recipeId && profile && !bakery && (
+          <RecipeComponentsSection recipeId={recipeId} businessId={profile.business_id} />
+        )}
 
         {!recipeId && (
           <p className="text-sm text-neutral-500">Guarda los datos básicos primero para poder añadir componentes.</p>

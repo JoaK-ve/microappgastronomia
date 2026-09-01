@@ -5,7 +5,16 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { ChangePasswordControl } from '@/components/ChangePasswordControl'
 import { APP_VERSION_DISPLAY } from '@/lib/version'
 import { getDaysRemaining, getEffectiveStatus, type EffectiveStatus } from '@/lib/businessLifecycle'
-import { IconBook, IconCalculator, IconGear, IconHome, IconLeaf, IconPot, IconUser } from '@/components/icons/NavIcons'
+import {
+  IconBook,
+  IconCalculator,
+  IconGear,
+  IconHome,
+  IconLeaf,
+  IconPot,
+  IconUser,
+  IconWheat,
+} from '@/components/icons/NavIcons'
 import type { Business } from '@/types'
 
 const LOGO_BUCKET = 'logos'
@@ -22,6 +31,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Inicio', end: true, adminOnly: false, icon: IconHome },
   { to: '/ingredientes', label: 'Ingredientes', end: false, adminOnly: false, icon: IconLeaf },
   { to: '/recetas', label: 'Recetas', end: false, adminOnly: false, icon: IconBook },
+  { to: '/panaderia', label: 'Panadería', end: false, adminOnly: false, icon: IconWheat },
   { to: '/escandallo', label: 'Escandallo', end: false, adminOnly: true, icon: IconCalculator },
   { to: '/produccion', label: 'Producción', end: false, adminOnly: false, icon: IconPot },
   { to: '/configuracion', label: 'Configuración', end: false, adminOnly: true, icon: IconGear },

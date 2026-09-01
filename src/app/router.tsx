@@ -57,6 +57,12 @@ const router = createBrowserRouter([
           { path: 'recetas/nueva', element: <RecipeFormPage /> },
           { path: 'recetas/:id', element: <RecipeViewPage /> },
           { path: 'recetas/:id/editar', element: <RecipeFormPage /> },
+          // Panadería reutiliza los mismos componentes que Recetas — el modo
+          // (normal/panadería) se decide por el propio path, ver useBakeryMode.
+          { path: 'panaderia', element: <RecipesPage /> },
+          { path: 'panaderia/nueva', element: <RecipeFormPage /> },
+          { path: 'panaderia/:id', element: <RecipeViewPage /> },
+          { path: 'panaderia/:id/editar', element: <RecipeFormPage /> },
           { path: 'escandallo', element: <EscandalloPage /> },
           { path: 'produccion', element: <ProductionPage /> },
           { path: 'configuracion', element: <SettingsPage /> },

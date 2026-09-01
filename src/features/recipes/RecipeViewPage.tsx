@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
+import { bakeryBasePath, useBakeryMode } from '@/features/recipes/useBakeryMode'
 import { CocinaView } from '@/features/recipes/views/CocinaView'
 import { CostesView } from '@/features/recipes/views/CostesView'
 import { ProducirView } from '@/features/recipes/views/ProducirView'
@@ -23,6 +24,8 @@ export function RecipeViewPage() {
   const navigate = useNavigate()
   const { profile } = useAuth()
   const isAdmin = profile?.role === 'admin'
+  const bakery = useBakeryMode()
+  const basePath = bakeryBasePath(bakery)
 
   const [deleteState, setDeleteState] = useState<'idle' | 'checking' | 'blocked' | 'confirm' | 'deleting'>('idle')
   const [deleteBlockers, setDeleteBlockers] = useState<RecipeDeleteBlockers | null>(null)
@@ -111,7 +114,7 @@ export function RecipeViewPage() {
       return
     }
 
-    navigate('/recetas', { replace: true })
+    navigate(basePath, { replace: true })
   }
 
   function handleDeleteCancel() {
@@ -146,7 +149,7 @@ export function RecipeViewPage() {
         </div>
         <div className="flex gap-2">
           <Link
-            to={`/recetas/${recipe.id}/editar`}
+            to={`${basePath}/${recipe.id}/editar`}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700"
           >
             Editar

@@ -8,7 +8,7 @@ import type { Business } from '@/types'
 const STATUS_BADGE_CLASS: Record<EffectiveStatus, string> = {
   trial: 'bg-green-100 text-green-700',
   grace: 'bg-amber-100 text-amber-700',
-  active: 'bg-neutral-900 text-white',
+  active: 'bg-brand-500 text-white',
   suspended: 'bg-red-100 text-red-700',
 }
 

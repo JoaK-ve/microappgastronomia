@@ -4,6 +4,15 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.7.1
+
+Identidad visual del panel de Super Admin — última pieza pendiente del rediseño terracota/crema (V1.5.1/V1.6.0), aplicada ahora también aquí.
+
+- Sidebar oscura + navegación con iconos, igual patrón que la app principal: lista con iconos en escritorio, barra inferior deslizable con "Cuenta" en móvil/tablet (`useState`/`useEffect` y clases calcadas de `AppLayout.tsx`, cero duplicación de lógica nueva).
+- 3 iconos nuevos en `NavIcons.tsx`: `IconBriefcase` (Negocios), `IconClipboard` (Auditoría), `IconShield` (Mi seguridad) — reutiliza `IconHome` y `IconUser` ya existentes para Dashboard/Usuarios.
+- Botones primarios y la insignia de estado "Active" (antes `bg-neutral-900`) pasan a `bg-brand-500` terracota, mismo criterio que el resto de la app.
+- Verificado con cuenta desechable de Super Admin (creada y eliminada en la misma sesión): escritorio y móvil, navegación activa, panel de "Cuenta", insignias de estado — todo correcto.
+
 ## V1.7.0
 
 Nueva sección "Panadería" — recetas de panadería en formato de porcentaje panadero (fórmula profesional real, a partir de una hoja de cálculo del negocio "La Esquina Caliente" con ~40 fórmulas reales de pan/repostería).

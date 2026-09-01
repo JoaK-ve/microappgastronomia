@@ -96,6 +96,35 @@ export function IconMore(props: IconProps) {
   )
 }
 
+export function IconBriefcase(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <rect x="3.5" y="7.5" width="17" height="12" rx="2" />
+      <path d="M8 7.5V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1.5" />
+      <path d="M3.5 12.5h17" />
+    </svg>
+  )
+}
+
+export function IconClipboard(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <rect x="6" y="4" width="12" height="17" rx="2" />
+      <path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" />
+      <path d="M9 10.5h6M9 14h6M9 17.5h3" />
+    </svg>
+  )
+}
+
+export function IconShield(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6Z" />
+      <path d="M9.3 12.2l1.8 1.8 3.3-3.8" />
+    </svg>
+  )
+}
+
 export function IconUser(props: IconProps) {
   return (
     <svg {...base(props)}>

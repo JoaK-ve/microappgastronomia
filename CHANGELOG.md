@@ -4,6 +4,15 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.7.2
+
+**Corrección de un bug real en la fórmula panadera** (V1.7.0), encontrado por el usuario probando la app: "el peso del paston es el total de la sumatoria de los ingredientes, no de la harina, y con una regla de 3 sacas cuánta harina necesitas".
+
+- El cálculo trataba Paston × Cantidad como si fuera el peso de la **harina**, cuando en realidad es el peso **total de la masa** (todos los ingredientes sumados). El peso de la harina se saca por una regla de tres usando la suma de **todos** los % cargados (no solo los marcados "harina base"): `harina = masa total / (suma de todos los % / 100)`.
+- Con la fórmula anterior, cualquier receta con más de una fila de harina base daba gramos incorrectos en cuanto se agregaban ingredientes no-harina — el bug pasó una verificación previa por error (comparé mal los números contra la hoja original).
+- Fórmula extraída a `src/features/recipes/bakeryFormula.ts`, con 5 tests nuevos (`bakeryFormula.test.ts`) contra los datos reales de "Pan Blanco de Aceitunas" — así no se puede repetir en silencio.
+- Re-verificado en producción con cuenta desechable: los 8 ingredientes de la fórmula real dan gramos exactos a la hoja original (541g, 60g, 301g, 12g, 12g, 120g, 90g, 3g).
+
 ## V1.7.1
 
 Identidad visual del panel de Super Admin — última pieza pendiente del rediseño terracota/crema (V1.5.1/V1.6.0), aplicada ahora también aquí.

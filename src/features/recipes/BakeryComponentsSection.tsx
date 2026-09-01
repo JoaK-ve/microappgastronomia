@@ -1,21 +1,13 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
+import { flourGramsFrom, gramsForRow } from '@/features/recipes/bakeryFormula'
 import type { Ingredient, Recipe, RecipeComponent, RecipeComponentCost, RecipeCost } from '@/types'
 
-// Fórmula panadera: la harina es la base 100% (puede repartirse entre
-// varias filas marcadas "harina base" — su suma debe dar 100). El resto de
-// ingredientes son % de ese mismo peso de harina. Paston (peso por pieza) ×
-// Cantidad (piezas) = peso total de la masa, de donde se calculan los
-// gramos reales de cada fila. Los gramos calculados se guardan en las
-// mismas columnas quantity/unit que usa el alta manual — el motor de
-// costes (recipe_costs / get_recipe_component_costs) no cambia nada.
-
-function flourGramsFrom(rows: { is_flour_base: boolean; flour_percent: number | null }[], totalDough: number) {
-  const flourSum = rows.reduce((sum, r) => (r.is_flour_base ? sum + (r.flour_percent ?? 0) : sum), 0)
-  if (!flourSum || !totalDough) return null
-  return { flourGrams: totalDough / (flourSum / 100), flourSum }
-}
+// La fórmula panadera en sí (ver bakeryFormula.ts, con tests contra datos
+// reales) — este componente solo la usa para calcular los gramos a
+// guardar en las mismas columnas quantity/unit que usa el alta manual; el
+// motor de costes (recipe_costs / get_recipe_component_costs) no cambia.
 
 export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: string; businessId: string }) {
   const { profile } = useAuth()
@@ -87,7 +79,7 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
 
     await Promise.all(
       rows.map((r) => {
-        const grams = ((r.flour_percent ?? 0) / 100) * result.flourGrams
+        const grams = gramsForRow(r.flour_percent, result.flourGrams)
         return supabase.from('recipe_components').update({ quantity: grams, unit: 'g' }).eq('id', r.id)
       }),
     )
@@ -126,18 +118,10 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
       return
     }
 
-    const flourSumAfter =
-      components.reduce((sum, r) => (r.is_flour_base ? sum + (r.flour_percent ?? 0) : sum), 0) +
-      (addIsFlourBase ? percentNum : 0)
-
-    if (!flourSumAfter) {
-      setError('Agrega primero al menos un ingrediente marcado como "harina base".')
-      return
-    }
-
+    const rowsAfter = [...components, { flour_percent: percentNum }]
     const totalDough = pastonNum * cantidadNum
-    const flourGrams = totalDough / (flourSumAfter / 100)
-    const grams = (percentNum / 100) * flourGrams
+    const result = flourGramsFrom(rowsAfter, totalDough)
+    const grams = result ? gramsForRow(percentNum, result.flourGrams) : 0
 
     const { error: insertError } = await supabase.from('recipe_components').insert({
       business_id: businessId,

@@ -9,8 +9,10 @@ import { CostesView } from '@/features/recipes/views/CostesView'
 import { ProducirView } from '@/features/recipes/views/ProducirView'
 import { CompletaView } from '@/features/recipes/views/CompletaView'
 import type {
+  Allergen,
   Ingredient,
   Recipe,
+  RecipeAllergens,
   RecipeComponent,
   RecipeComponentCost,
   RecipeCost,
@@ -37,6 +39,7 @@ export function RecipeViewPage() {
   const [recipeNames, setRecipeNames] = useState<Record<string, string>>({})
   const [cost, setCost] = useState<RecipeCost | null>(null)
   const [componentCosts, setComponentCosts] = useState<RecipeComponentCost[]>([])
+  const [allergens, setAllergens] = useState<Allergen[]>([])
   const [tab, setTab] = useState<Tab>('cocina')
   const [loading, setLoading] = useState(true)
 
@@ -48,16 +51,18 @@ export function RecipeViewPage() {
   async function loadAll(recipeId: string) {
     setLoading(true)
 
-    const [{ data: recipeData }, { data: compsData }, { data: ingredientsData }, { data: recipesData }] =
+    const [{ data: recipeData }, { data: compsData }, { data: ingredientsData }, { data: recipesData }, { data: allergensData }] =
       await Promise.all([
         supabase.from('recipes').select('*').eq('id', recipeId).single(),
         supabase.from('recipe_components').select('*').eq('recipe_id', recipeId).order('position'),
         supabase.from('ingredients').select('*'),
         supabase.from('recipes').select('id, name'),
+        supabase.from('recipe_allergens').select('*').eq('recipe_id', recipeId).single(),
       ])
 
     setRecipe((recipeData as Recipe) ?? null)
     setComponents((compsData as RecipeComponent[]) ?? [])
+    setAllergens((allergensData as RecipeAllergens | null)?.allergens ?? [])
 
     const ingMap: Record<string, string> = {}
     for (const ing of (ingredientsData as Ingredient[]) ?? []) ingMap[ing.id] = ing.name
@@ -264,6 +269,7 @@ export function RecipeViewPage() {
             components={components}
             ingredientNames={ingredientNames}
             recipeNames={recipeNames}
+            allergens={allergens}
           />
         )}
         {tab === 'costes' && isAdmin && <CostesView cost={cost} componentCosts={componentCosts} />}
@@ -276,6 +282,7 @@ export function RecipeViewPage() {
             recipeNames={recipeNames}
             cost={cost}
             componentCosts={componentCosts}
+            allergens={allergens}
           />
         )}
       </div>

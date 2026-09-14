@@ -4,6 +4,17 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.8.0
+
+**Alérgenos** — los 14 de declaración obligatoria en la UE (Reglamento 1169/2011), marcados por ingrediente y heredados automáticamente por cada receta.
+
+- Nueva tabla `ingredient_allergens`: en el alta/edición de un ingrediente se marcan los alérgenos que contiene (casillas, mismo criterio de permisos que el resto del ingrediente — todo el negocio ve, solo admin edita).
+- Cada receta calcula sus alérgenos solos, sumando los de sus componentes — ingredientes directos y subrecetas, **recursivamente**. Mismo patrón que el motor de costes (`compute_recipe_cost`): una función `compute_recipe_allergens` con la misma protección contra ciclos, expuesta en una vista `recipe_allergens`. Ningún motor nuevo que mantener aparte.
+- A diferencia del coste, los alérgenos los ve **cualquier rol** (cocina incluido) — es información de seguridad alimentaria, no financiera.
+- Se muestran en la ficha de cocina y en la vista completa de cada receta, como aviso destacado arriba de todo.
+- Verificado en producción con cuenta desechable: cadena real de 3 subrecetas anidadas (Nivel 1 → Nivel 2 → Nivel 3) propaga el alérgeno correctamente hasta arriba; rol cocina lo ve, guardado/edición de casillas confirmado contra la base de datos.
+- Los ~99 ingredientes reales existentes (Tío Pollo + La Esquina Caliente) todavía no tienen alérgenos marcados — pendiente una clasificación asistida, revisada por el usuario antes de guardar nada (igual que el importador: nada se escribe sin aprobación).
+
 ## V1.7.2
 
 **Corrección de un bug real en la fórmula panadera** (V1.7.0), encontrado por el usuario probando la app: "el peso del paston es el total de la sumatoria de los ingredientes, no de la harina, y con una regla de 3 sacas cuánta harina necesitas".

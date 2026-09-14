@@ -1,5 +1,33 @@
 export type Unit = 'g' | 'kg' | 'ml' | 'L' | 'ud'
 
+export type Allergen =
+  | 'gluten'
+  | 'crustaceos'
+  | 'huevos'
+  | 'pescado'
+  | 'cacahuetes'
+  | 'soja'
+  | 'lacteos'
+  | 'frutos_cascara'
+  | 'apio'
+  | 'mostaza'
+  | 'sesamo'
+  | 'sulfitos'
+  | 'altramuces'
+  | 'moluscos'
+
+export type IngredientAllergen = {
+  ingredient_id: string
+  allergen: Allergen
+  business_id: string
+}
+
+export type RecipeAllergens = {
+  recipe_id: string
+  business_id: string
+  allergens: Allergen[]
+}
+
 export type UserRole = 'admin' | 'kitchen'
 
 export type BusinessStatus = 'trial' | 'active' | 'expired' | 'suspended'

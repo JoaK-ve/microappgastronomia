@@ -1,6 +1,6 @@
 import { CocinaView } from '@/features/recipes/views/CocinaView'
 import { CostesView } from '@/features/recipes/views/CostesView'
-import type { Recipe, RecipeComponent, RecipeComponentCost, RecipeCost } from '@/types'
+import type { Allergen, Recipe, RecipeComponent, RecipeComponentCost, RecipeCost } from '@/types'
 
 export function CompletaView({
   recipe,
@@ -9,6 +9,7 @@ export function CompletaView({
   recipeNames,
   cost,
   componentCosts,
+  allergens = [],
 }: {
   recipe: Recipe
   components: RecipeComponent[]
@@ -16,6 +17,7 @@ export function CompletaView({
   recipeNames: Record<string, string>
   cost: RecipeCost | null
   componentCosts: RecipeComponentCost[]
+  allergens?: Allergen[]
 }) {
   return (
     <div className="space-y-6 print:space-y-4">
@@ -47,6 +49,7 @@ export function CompletaView({
         components={components}
         ingredientNames={ingredientNames}
         recipeNames={recipeNames}
+        allergens={allergens}
       />
 
       {/* Información económica: misma vista que Costes, sin duplicar. */}

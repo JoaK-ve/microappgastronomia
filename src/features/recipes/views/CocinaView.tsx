@@ -1,4 +1,5 @@
-import type { Recipe, RecipeComponent } from '@/types'
+import { ALLERGEN_LABEL } from '@/lib/allergens'
+import type { Allergen, Recipe, RecipeComponent } from '@/types'
 
 function componentName(
   component: RecipeComponent,
@@ -16,14 +17,32 @@ export function CocinaView({
   components,
   ingredientNames,
   recipeNames,
+  allergens = [],
 }: {
   recipe: Recipe
   components: RecipeComponent[]
   ingredientNames: Record<string, string>
   recipeNames: Record<string, string>
+  allergens?: Allergen[]
 }) {
   return (
     <div className="space-y-6 print:space-y-4">
+      {allergens.length > 0 && (
+        <section className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3">
+          <h2 className="text-sm font-medium text-amber-800">Alérgenos</h2>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {allergens.map((allergen) => (
+              <span
+                key={allergen}
+                className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800"
+              >
+                {ALLERGEN_LABEL[allergen]}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section>
         <h2 className="text-lg font-medium">Ingredientes</h2>
         {components.length === 0 ? (

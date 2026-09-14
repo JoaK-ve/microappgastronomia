@@ -5,7 +5,8 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { EquivalencesSection } from '@/features/ingredients/EquivalencesSection'
 import { PurchaseFormatsSection } from '@/features/ingredients/PurchaseFormatsSection'
-import type { IngredientDeleteBlockers, Unit } from '@/types'
+import { ALLERGENS, ALLERGEN_LABEL } from '@/lib/allergens'
+import type { Allergen, IngredientDeleteBlockers, Unit } from '@/types'
 
 const UNITS: Unit[] = ['g', 'kg', 'ml', 'L', 'ud']
 
@@ -19,6 +20,7 @@ export function IngredientFormPage() {
   const [name, setName] = useState('')
   const [category, setCategory] = useState('')
   const [usageUnit, setUsageUnit] = useState<Unit>('g')
+  const [allergens, setAllergens] = useState<Set<Allergen>>(new Set())
 
   const [loading, setLoading] = useState(isEdit)
   const [notFound, setNotFound] = useState(false)
@@ -36,15 +38,45 @@ export function IngredientFormPage() {
 
   async function loadIngredient(ingredientIdToLoad: string) {
     setLoading(true)
-    const { data } = await supabase.from('ingredients').select('*').eq('id', ingredientIdToLoad).single()
+    const [{ data }, { data: allergenRows }] = await Promise.all([
+      supabase.from('ingredients').select('*').eq('id', ingredientIdToLoad).single(),
+      supabase.from('ingredient_allergens').select('allergen').eq('ingredient_id', ingredientIdToLoad),
+    ])
     if (data) {
       setName(data.name)
       setCategory(data.category ?? '')
       setUsageUnit(data.usage_unit)
+      setAllergens(new Set((allergenRows ?? []).map((row) => row.allergen as Allergen)))
     } else {
       setNotFound(true)
     }
     setLoading(false)
+  }
+
+  function toggleAllergen(allergen: Allergen) {
+    setAllergens((prev) => {
+      const next = new Set(prev)
+      if (next.has(allergen)) {
+        next.delete(allergen)
+      } else {
+        next.add(allergen)
+      }
+      return next
+    })
+  }
+
+  // Reemplaza siempre el conjunto completo: más simple que calcular el
+  // diff, y el volumen (máximo 14 filas) no lo justifica.
+  async function saveAllergens(targetIngredientId: string) {
+    await supabase.from('ingredient_allergens').delete().eq('ingredient_id', targetIngredientId)
+    if (allergens.size === 0 || !profile) return
+    await supabase.from('ingredient_allergens').insert(
+      Array.from(allergens).map((allergen) => ({
+        ingredient_id: targetIngredientId,
+        allergen,
+        business_id: profile.business_id,
+      })),
+    )
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -61,12 +93,14 @@ export function IngredientFormPage() {
         .update({ name, category: category || null, usage_unit: usageUnit })
         .eq('id', ingredientId)
 
-      setSaving(false)
-
       if (updateError) {
+        setSaving(false)
         setError('No se pudo guardar el ingrediente.')
         return
       }
+
+      await saveAllergens(ingredientId)
+      setSaving(false)
       return
     }
 
@@ -76,13 +110,14 @@ export function IngredientFormPage() {
       .select('id')
       .single()
 
-    setSaving(false)
-
     if (insertError || !data) {
+      setSaving(false)
       setError('No se pudo crear el ingrediente.')
       return
     }
 
+    await saveAllergens(data.id)
+    setSaving(false)
     setIngredientId(data.id)
     navigate(`/ingredientes/${data.id}`, { replace: true })
   }
@@ -239,6 +274,25 @@ export function IngredientFormPage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <span className="block text-sm font-medium text-neutral-700">Alérgenos</span>
+            <p className="mt-0.5 text-xs text-neutral-500">
+              Los que contiene este ingrediente — las recetas que lo usan los heredan solas.
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1.5 sm:grid-cols-3">
+              {ALLERGENS.map((allergen) => (
+                <label key={allergen} className="flex items-center gap-1.5 text-sm text-neutral-700">
+                  <input
+                    type="checkbox"
+                    checked={allergens.has(allergen)}
+                    onChange={() => toggleAllergen(allergen)}
+                  />
+                  {ALLERGEN_LABEL[allergen]}
+                </label>
+              ))}
+            </div>
           </div>
 
           <button

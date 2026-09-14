@@ -4,6 +4,14 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.8.1
+
+Botón "✨ Sugerir con IA" en el alta/edición de un ingrediente (V1.8.0) — para cuando quien lo carga no sabe de memoria si contiene algún alérgeno.
+
+- Nueva Edge Function `suggest-ingredient-allergens` (solo admin, mismo patrón de autenticación que `invite-user`): le pasa el nombre y categoría del ingrediente a Claude Haiku, que devuelve los alérgenos que le corresponden con confianza — y, si es un producto comercial donde el alérgeno real depende de la marca (salsas, mejoradores...), **no adivina**: deja una nota explicando qué revisar en la etiqueta real, en vez de marcar algo sin certeza.
+- La sugerencia solo pre-marca las casillas — **nunca guarda sola**, sigue haciendo falta pulsar "Guardar" para confirmar. Mismo principio que el importador: la IA propone, la persona decide.
+- **Pendiente de un paso manual para quedar activo**: falta cargar el secreto `ANTHROPIC_API_KEY` en el proyecto de Supabase (Project Settings → Edge Functions → Secrets) — sin él, el botón responde con un aviso claro en vez de fallar en silencio.
+
 ## V1.8.0
 
 **Alérgenos** — los 14 de declaración obligatoria en la UE (Reglamento 1169/2011), marcados por ingrediente y heredados automáticamente por cada receta.

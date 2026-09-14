@@ -21,6 +21,9 @@ export function IngredientFormPage() {
   const [category, setCategory] = useState('')
   const [usageUnit, setUsageUnit] = useState<Unit>('g')
   const [allergens, setAllergens] = useState<Set<Allergen>>(new Set())
+  const [suggesting, setSuggesting] = useState(false)
+  const [suggestNote, setSuggestNote] = useState<string | null>(null)
+  const [suggestError, setSuggestError] = useState<string | null>(null)
 
   const [loading, setLoading] = useState(isEdit)
   const [notFound, setNotFound] = useState(false)
@@ -51,6 +54,30 @@ export function IngredientFormPage() {
       setNotFound(true)
     }
     setLoading(false)
+  }
+
+  async function handleSuggestAllergens() {
+    if (!name.trim()) {
+      setSuggestError('Escribe primero el nombre del ingrediente.')
+      return
+    }
+    setSuggesting(true)
+    setSuggestError(null)
+    setSuggestNote(null)
+
+    const { data, error: invokeError } = await supabase.functions.invoke('suggest-ingredient-allergens', {
+      body: { name, category },
+    })
+
+    setSuggesting(false)
+
+    if (invokeError || data?.error) {
+      setSuggestError(data?.error ?? 'No se pudo obtener la sugerencia. Inténtalo de nuevo.')
+      return
+    }
+
+    setAllergens(new Set(data.allergens as Allergen[]))
+    setSuggestNote(data.note ?? null)
   }
 
   function toggleAllergen(allergen: Allergen) {
@@ -277,10 +304,26 @@ export function IngredientFormPage() {
           </div>
 
           <div>
-            <span className="block text-sm font-medium text-neutral-700">Alérgenos</span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="block text-sm font-medium text-neutral-700">Alérgenos</span>
+              <button
+                type="button"
+                onClick={() => void handleSuggestAllergens()}
+                disabled={suggesting}
+                className="rounded-md border border-neutral-300 px-2.5 py-1 text-xs font-medium text-neutral-700 disabled:opacity-50"
+              >
+                {suggesting ? 'Pensando…' : '✨ Sugerir con IA'}
+              </button>
+            </div>
             <p className="mt-0.5 text-xs text-neutral-500">
               Los que contiene este ingrediente — las recetas que lo usan los heredan solas.
             </p>
+            {suggestError && <p className="mt-1.5 text-xs text-red-600">{suggestError}</p>}
+            {suggestNote && (
+              <p className="mt-1.5 rounded-md bg-amber-50 px-2.5 py-1.5 text-xs text-amber-800">
+                Sugerencia de IA — revisa antes de guardar: {suggestNote}
+              </p>
+            )}
             <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1.5 sm:grid-cols-3">
               {ALLERGENS.map((allergen) => (
                 <label key={allergen} className="flex items-center gap-1.5 text-sm text-neutral-700">

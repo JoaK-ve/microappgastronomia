@@ -95,6 +95,8 @@ Deno.serve(async (req) => {
   })
 
   if (!anthropicResponse.ok) {
+    const errorText = await anthropicResponse.text()
+    console.error('Anthropic API error', anthropicResponse.status, errorText)
     return json({ error: 'No se pudo obtener la sugerencia. Inténtalo de nuevo.' }, 502)
   }
 

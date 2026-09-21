@@ -4,6 +4,16 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.8.2
+
+**Respaldo diario automático dentro de Supabase** — a petición del usuario, tras un aviso de Supabase sobre suspensión por inactividad de proyectos gratuitos.
+
+- Cron `daily-snapshot` (`pg_cron`, todos los días a las 03:00 UTC): copia **todas las tablas del esquema `public`** (una fila por tabla y día, con sus filas en `jsonb`) a `backup.snapshots` y borra las de más de 30 días. Función `backup.take_snapshot(p_keep_days)`.
+- Pensado contra el error humano (borrar o editar algo por accidente), que es el riesgo real del día a día. Cómo restaurar una tabla queda documentado en la propia migración (`jsonb_populate_recordset`).
+- **Verificado de verdad, no solo creado**: las 14 tablas de la primera copia coinciden fila por fila con las reales (234 filas en total — se comprobó a propósito porque una copia hecha bajo RLS podría salir vacía sin avisar), y se reconstruyeron los 99 ingredientes desde el JSON para confirmar que se puede restaurar.
+- El esquema `backup` no está expuesto por la API (PostgREST responde `406 Invalid schema`) y `anon`/`authenticated` no tienen permisos sobre él.
+- **Límites, a propósito**: vive en la misma base de datos, así que **no protege si se pierde el proyecto entero** — no sustituye a un respaldo fuera de Supabase. Tampoco incluye `auth.users` (los accesos) ni los archivos de Storage (logos). El aviso de suspensión por inactividad se previene con uso real del proyecto (o con el plan Pro), no con este respaldo.
+
 ## V1.8.1
 
 Botón "✨ Sugerir con IA" en el alta/edición de un ingrediente (V1.8.0) — para cuando quien lo carga no sabe de memoria si contiene algún alérgeno.

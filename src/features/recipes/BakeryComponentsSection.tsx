@@ -148,7 +148,7 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
     await recalcAndSave(fresh, pastonNum, cantidadNum)
   }
 
-  async function handleRowChange(id: string, patch: { flour_percent?: number; is_flour_base?: boolean }) {
+  async function handleRowChange(id: string, patch: { flour_percent?: number; is_flour_base?: boolean; ingredient_id?: string }) {
     const updated = components.map((c) => (c.id === id ? { ...c, ...patch } : c))
     setComponents(updated)
     await supabase.from('recipe_components').update(patch).eq('id', id)
@@ -260,7 +260,23 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
             <tbody>
               {components.map((c) => (
                 <tr key={c.id} className="border-b border-neutral-100 last:border-0">
-                  <td className="py-2 pr-2">{ingredientName(c.ingredient_id)}</td>
+                  <td className="py-2 pr-2">
+                    <select
+                      aria-label={`Ingrediente de ${ingredientName(c.ingredient_id)}`}
+                      value={c.ingredient_id ?? ''}
+                      onChange={(event) => void handleRowChange(c.id, { ingredient_id: event.target.value })}
+                      className="max-w-[12rem] rounded-md border border-neutral-200 px-1 py-1 text-sm"
+                    >
+                      {!ingredients.some((i) => i.id === c.ingredient_id) && (
+                        <option value={c.ingredient_id ?? ''}>Ingrediente eliminado</option>
+                      )}
+                      {ingredients.map((ingredient) => (
+                        <option key={ingredient.id} value={ingredient.id}>
+                          {ingredient.name}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
                   <td className="py-2 pr-2 text-center">
                     <input
                       type="checkbox"

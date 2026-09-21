@@ -20,6 +20,14 @@ export function RecipeComponentsSection({ recipeId, businessId }: { recipeId: st
   const [unit, setUnit] = useState<Unit>('g')
   const [error, setError] = useState<string | null>(null)
 
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editType, setEditType] = useState<RecipeComponentType>('ingredient')
+  const [editSelectedId, setEditSelectedId] = useState('')
+  const [editQuantity, setEditQuantity] = useState('')
+  const [editUnit, setEditUnit] = useState<Unit>('g')
+  const [editError, setEditError] = useState<string | null>(null)
+  const [editSaving, setEditSaving] = useState(false)
+
   useEffect(() => {
     void loadAll()
   }, [recipeId, isAdmin])
@@ -88,6 +96,56 @@ export function RecipeComponentsSection({ recipeId, businessId }: { recipeId: st
     void loadAll()
   }
 
+  function startEdit(component: RecipeComponent) {
+    setEditingId(component.id)
+    setEditType(component.component_type)
+    setEditSelectedId(
+      (component.component_type === 'ingredient' ? component.ingredient_id : component.component_recipe_id) ?? '',
+    )
+    setEditQuantity(String(component.quantity))
+    setEditUnit(component.unit)
+    setEditError(null)
+  }
+
+  async function handleSaveEdit(event: FormEvent) {
+    event.preventDefault()
+    if (!editingId) return
+    setEditError(null)
+
+    if (!editSelectedId) {
+      setEditError('Elige un ingrediente o receta.')
+      return
+    }
+    const quantityNum = Number(editQuantity)
+    if (!editQuantity || Number.isNaN(quantityNum) || quantityNum < 0) {
+      setEditError('La cantidad debe ser un número válido.')
+      return
+    }
+
+    setEditSaving(true)
+    const { error: updateError } = await supabase
+      .from('recipe_components')
+      .update({
+        component_type: editType,
+        ingredient_id: editType === 'ingredient' ? editSelectedId : null,
+        component_recipe_id: editType === 'recipe' ? editSelectedId : null,
+        quantity: quantityNum,
+        unit: editUnit,
+      })
+      .eq('id', editingId)
+    setEditSaving(false)
+
+    if (updateError) {
+      setEditError(
+        updateError.message.includes('circular') ? updateError.message : 'No se pudo guardar el cambio.',
+      )
+      return
+    }
+
+    setEditingId(null)
+    void loadAll()
+  }
+
   const options = componentType === 'ingredient' ? ingredients : recipes
 
   return (
@@ -128,22 +186,106 @@ export function RecipeComponentsSection({ recipeId, businessId }: { recipeId: st
       {components.length > 0 && (
         <ul className="mt-3 divide-y divide-neutral-100">
           {components.map((component) => (
-            <li key={component.id} className="flex items-center justify-between py-2 text-sm">
-              <span>
-                {displayName(component)} — {component.quantity} {component.unit}
-                {component.component_type === 'recipe' && (
-                  <span className="ml-2 rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600">
-                    receta
+            <li key={component.id} className="py-2 text-sm">
+              {editingId === component.id ? (
+                <form onSubmit={handleSaveEdit} className="flex flex-wrap items-end gap-2">
+                  {editError && (
+                    <p role="alert" className="w-full rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+                      {editError}
+                    </p>
+                  )}
+                  <select
+                    aria-label="Tipo de componente"
+                    value={editType}
+                    onChange={(event) => {
+                      setEditType(event.target.value as RecipeComponentType)
+                      setEditSelectedId('')
+                    }}
+                    className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+                  >
+                    <option value="ingredient">Ingrediente</option>
+                    <option value="recipe">Receta</option>
+                  </select>
+                  <select
+                    aria-label="Ingrediente o receta"
+                    value={editSelectedId}
+                    onChange={(event) => setEditSelectedId(event.target.value)}
+                    className="min-w-[10rem] flex-1 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+                  >
+                    <option value="" disabled>
+                      {editType === 'ingredient' ? 'Elige un ingrediente' : 'Elige una receta'}
+                    </option>
+                    {(editType === 'ingredient' ? ingredients : recipes).map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.name}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    aria-label="Cantidad"
+                    type="number"
+                    step="any"
+                    min="0"
+                    required
+                    value={editQuantity}
+                    onChange={(event) => setEditQuantity(event.target.value)}
+                    className="w-24 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+                  />
+                  <select
+                    aria-label="Unidad"
+                    value={editUnit}
+                    onChange={(event) => setEditUnit(event.target.value as Unit)}
+                    className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+                  >
+                    {UNITS.map((u) => (
+                      <option key={u} value={u}>
+                        {u}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="submit"
+                    disabled={editSaving}
+                    className="rounded-md bg-brand-500 hover:bg-brand-600 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                  >
+                    {editSaving ? 'Guardando…' : 'Guardar'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingId(null)}
+                    className="px-2 py-1.5 text-sm text-neutral-500 hover:text-neutral-800"
+                  >
+                    Cancelar
+                  </button>
+                </form>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span>
+                    {displayName(component)} — {component.quantity} {component.unit}
+                    {component.component_type === 'recipe' && (
+                      <span className="ml-2 rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600">
+                        receta
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-              <button
-                type="button"
-                onClick={() => void handleDelete(component.id)}
-                className="text-neutral-400 hover:text-red-600"
-              >
-                Eliminar
-              </button>
+                  <span className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => startEdit(component)}
+                      className="text-neutral-500 hover:text-brand-600"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleDelete(component.id)}
+                      className="text-neutral-400 hover:text-red-600"
+                    >
+                      Eliminar
+                    </button>
+                  </span>
+                </div>
+              )}
             </li>
           ))}
         </ul>

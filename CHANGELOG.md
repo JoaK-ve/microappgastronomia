@@ -4,6 +4,15 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.10.0
+
+**Editar recetas sin pelearse con la pantalla** — a raíz de un reporte de uso real: "le doy a Guardar cambios y no hace nada" y "para cambiar un ingrediente de una receta tengo que borrarlo y añadirlo de nuevo".
+
+- **Guardar cambios**: el botón estaba al final de un formulario largo y, aunque sí guardaba, no mostraba nada. Ahora hay una barra fija abajo, siempre visible, con el botón; al guardar aparece "✓ Cambios guardados" (5 s) y los errores salen junto al botón, no arriba del todo. Un nombre vacío se rechaza con mensaje.
+- **Editar un componente**: cada línea de la receta tiene "Editar" — se puede cambiar el ingrediente o subreceta, el tipo, la cantidad y la unidad, con Guardar/Cancelar. Se guarda al momento (como añadir/eliminar) y respeta las reglas de la base (sin ciclos entre subrecetas, mismo negocio).
+- **Panadería**: el ingrediente de cada fila de la fórmula ahora se puede cambiar desde la propia tabla (los % y "harina base" ya eran editables).
+- Sin cambios en la base de datos.
+
 ## V1.9.1
 
 **Recuperar una restauración equivocada: procedimiento escrito y ensayado** (`docs/RECUPERAR_COPIA_PREVIA.md`, enlazado desde el README).

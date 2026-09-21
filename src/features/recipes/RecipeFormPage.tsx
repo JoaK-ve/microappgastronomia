@@ -49,6 +49,13 @@ export function RecipeFormPage() {
   const [notFound, setNotFound] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [savedAt, setSavedAt] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!savedAt) return
+    const timer = setTimeout(() => setSavedAt(null), 5000)
+    return () => clearTimeout(timer)
+  }, [savedAt])
 
   useEffect(() => {
     if (!id) return
@@ -151,8 +158,14 @@ export function RecipeFormPage() {
 
   async function handleSubmit() {
     setError(null)
+    setSavedAt(null)
 
     if (!profile) return
+
+    if (!name.trim()) {
+      setError('El nombre de la receta no puede estar vacío.')
+      return
+    }
 
     setSaving(true)
 
@@ -182,6 +195,7 @@ export function RecipeFormPage() {
         }
         return
       }
+      setSavedAt(Date.now())
       return
     }
 
@@ -227,8 +241,6 @@ export function RecipeFormPage() {
       </h1>
 
       <div className="space-y-6">
-        {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
-
         <section className="rounded-lg border border-neutral-200 bg-white p-4">
           <h2 className="text-lg font-medium">Identificación</h2>
           <div className="mt-3 space-y-3">
@@ -479,14 +491,26 @@ export function RecipeFormPage() {
           </div>
         </section>
 
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={saving}
-          className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-        >
-          {saving ? 'Guardando…' : recipeId ? 'Guardar cambios' : 'Crear receta'}
-        </button>
+        <div className="sticky bottom-0 z-10 -mx-1 flex flex-wrap items-center gap-3 border-t border-neutral-200 bg-white/95 px-1 py-3 backdrop-blur">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={saving}
+            className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          >
+            {saving ? 'Guardando…' : recipeId ? 'Guardar cambios' : 'Crear receta'}
+          </button>
+          {savedAt && (
+            <p role="status" className="text-sm font-medium text-green-700">
+              ✓ Cambios guardados
+            </p>
+          )}
+          {error && (
+            <p role="alert" className="rounded-md bg-red-50 px-3 py-1.5 text-sm text-red-700">
+              {error}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   )

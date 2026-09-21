@@ -4,6 +4,15 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.0
+
+**Aviso cuando el rendimiento no cuadra con los ingredientes** — a raíz de un caso real (Mix de Especias): los ingredientes sumaban 360 g pero el rendimiento decía 260 g, y el coste por gramo (coste total ÷ rendimiento) salía 0,0088 € en vez de 0,0064 €.
+
+- En el formulario de la receta, sección Rendimiento: si los ingredientes suman distinto del rendimiento (más de un 2 %), sale un aviso ámbar con la suma real y un botón "Usar X g" que rellena el rendimiento (luego se guarda con Guardar cambios). Explica que si la receta pierde peso al cocinarse es normal.
+- Solo compara cuando es honesto: todos los componentes son ingredientes en masa o volumen de la misma familia que el rendimiento (no compara subrecetas ni unidades). No aplica a Panadería.
+- Solo avisa: **no cambia ningún cálculo** de coste.
+- Dato corregido: Mix de Especias de Tío Pollo pasa de rendimiento 260 g a 360 g.
+
 ## V1.10.1
 
 **Editar y Eliminar ahora son botones** (antes eran texto suelto, difíciles de distinguir y de pulsar en móvil). "Editar" con borde neutro, "Eliminar" con borde y texto rojo. Aplica a los componentes de la receta, a la tabla de fórmula panadera y a los pasos de elaboración. Solo estilo, sin cambios de comportamiento.

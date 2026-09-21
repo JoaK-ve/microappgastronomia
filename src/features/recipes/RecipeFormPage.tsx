@@ -5,7 +5,8 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { RecipeComponentsSection } from '@/features/recipes/RecipeComponentsSection'
 import { BakeryComponentsSection } from '@/features/recipes/BakeryComponentsSection'
 import { bakeryBasePath, useBakeryMode } from '@/features/recipes/useBakeryMode'
-import type { RecipeCategory, Unit } from '@/types'
+import { yieldMismatch } from '@/features/recipes/yieldCheck'
+import type { RecipeCategory, RecipeComponent, Unit } from '@/types'
 
 const UNITS: Unit[] = ['g', 'kg', 'ml', 'L', 'ud']
 const CODE_PATTERN = /^REC-(\d+)$/
@@ -49,6 +50,7 @@ export function RecipeFormPage() {
   const [notFound, setNotFound] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [components, setComponents] = useState<RecipeComponent[]>([])
   const [savedAt, setSavedAt] = useState<number | null>(null)
 
   useEffect(() => {
@@ -220,6 +222,8 @@ export function RecipeFormPage() {
     navigate(`${basePath}/${data.id}/editar`, { replace: true })
   }
 
+  const mismatch = yieldMismatch(components, Number(yieldQuantity), yieldUnit)
+
   if (loading) {
     return <p className="text-neutral-500">Cargando…</p>
   }
@@ -357,7 +361,11 @@ export function RecipeFormPage() {
           <BakeryComponentsSection recipeId={recipeId} businessId={profile.business_id} />
         )}
         {recipeId && profile && !bakery && (
-          <RecipeComponentsSection recipeId={recipeId} businessId={profile.business_id} />
+          <RecipeComponentsSection
+            recipeId={recipeId}
+            businessId={profile.business_id}
+            onComponentsChange={setComponents}
+          />
         )}
 
         {!recipeId && (
@@ -435,6 +443,24 @@ export function RecipeFormPage() {
               ))}
             </select>
           </div>
+          {!bakery && mismatch && (
+            <div role="note" className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              <p>
+                Tus ingredientes suman <strong>{mismatch.sum} {mismatch.unit}</strong> pero el rendimiento es{' '}
+                <strong>{yieldQuantity} {yieldUnit}</strong>. El coste por {yieldUnit} se calcula dividiendo el coste
+                total entre el rendimiento, así que sale distinto de lo que esperas. Si la receta pierde peso al
+                cocinarse es normal; si no, ajusta el rendimiento.
+              </p>
+              <button
+                type="button"
+                onClick={() => setYieldQuantity(String(mismatch.sum))}
+                className="mt-2 rounded-md border border-amber-300 bg-white px-3 py-1 text-xs font-medium text-amber-800 hover:bg-amber-100"
+              >
+                Usar {mismatch.sum} {mismatch.unit}
+              </button>
+              <span className="ml-2 text-xs text-amber-700">(luego pulsa Guardar cambios)</span>
+            </div>
+          )}
         </section>
 
         <section className="rounded-lg border border-neutral-200 bg-white p-4">

@@ -5,7 +5,15 @@ import type { Ingredient, Recipe, RecipeComponent, RecipeComponentType, RecipeCo
 
 const UNITS: Unit[] = ['g', 'kg', 'ml', 'L', 'ud']
 
-export function RecipeComponentsSection({ recipeId, businessId }: { recipeId: string; businessId: string }) {
+export function RecipeComponentsSection({
+  recipeId,
+  businessId,
+  onComponentsChange,
+}: {
+  recipeId: string
+  businessId: string
+  onComponentsChange?: (components: RecipeComponent[]) => void
+}) {
   const { profile } = useAuth()
   const isAdmin = profile?.role === 'admin'
 
@@ -39,6 +47,7 @@ export function RecipeComponentsSection({ recipeId, businessId }: { recipeId: st
       supabase.from('recipes').select('*').neq('id', recipeId).order('name'),
     ])
     setComponents((comps as RecipeComponent[]) ?? [])
+    onComponentsChange?.((comps as RecipeComponent[]) ?? [])
     setIngredients((ings as Ingredient[]) ?? [])
     setRecipes((recs as Recipe[]) ?? [])
 

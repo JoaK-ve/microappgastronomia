@@ -4,6 +4,16 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.9.1
+
+**Recuperar una restauración equivocada: procedimiento escrito y ensayado** (`docs/RECUPERAR_COPIA_PREVIA.md`, enlazado desde el README).
+
+- V1.9.0 guarda una copia previa antes de cada restauración, pero recuperarla solo era posible "a mano por SQL" y **nunca se había ensayado**. Ahora hay un procedimiento de 3 pasos: listar las copias, recuperar, comprobar.
+- La recuperación no duplica lógica: llama a `restore_business_backup` — el mismo código, con las mismas comprobaciones que usa la app — actuando como un admin del negocio solo durante la transacción. Por eso es todo o nada, exige negocio operativo, y **también deja su propia copia previa**: una recuperación equivocada se puede deshacer.
+- **Ensayado con datos de prueba en producción (26 comprobaciones)** ejecutando *el texto exacto del documento*, no una versión aparte: el admin restaura el archivo viejo y "pierde" su trabajo; la recuperación lo devuelve idéntico tabla por tabla; una fecha equivocada, un negocio inexistente y un negocio suspendido se rechazan sin cambiar nada; y la propia recuperación se deshace y se rehace. Sin restos de prueba.
+- **No cubre** el respaldo diario (`reason = 'daily'`, todos los negocios juntos): usa otro procedimiento que todavía no está ensayado. Tampoco sirve si se pierde el proyecto entero.
+- Sin cambios en la app ni en la base de datos.
+
 ## V1.9.0
 
 **Respaldo y restauración por negocio** — a petición del usuario ("como hacemos en WheelOS"): cada negocio puede llevarse una copia de SUS datos y volver a cargarla, sin depender de la plataforma. Configuración → "Respaldo" (solo admin).

@@ -7,7 +7,7 @@ Especificación funcional: Documento Maestro — MicroApp Gastronómica V0.4.
 
 ## Versión actual
 
-**V1.9.0**
+**V1.9.1**
 
 Esquema `VMAJOR.MINOR.PATCH` (versión de la **aplicación**, no de las
 recetas — son conceptos independientes; la versión de cada receta vive
@@ -77,6 +77,13 @@ Todas las tablas de negocio tienen Row Level Security activado: un usuario
 solo puede leer o escribir datos de su propio negocio, verificado en la
 base de datos (no solo en el frontend).
 
+### Operación
+
+- **Un admin restauró el respaldo equivocado y perdió trabajo:** el sistema
+  guarda antes una copia del estado anterior (90 días). El procedimiento
+  para recuperarla, ensayado de punta a punta, está en
+  [`docs/RECUPERAR_COPIA_PREVIA.md`](./docs/RECUPERAR_COPIA_PREVIA.md).
+
 ## Tests
 
 ```bash
@@ -116,6 +123,6 @@ ejecución, nunca en el bundle del cliente).
 
 ## Estado
 
-V1.9.0 — funcional, desplegable, en producción en Cloudflare Pages. Ver
+V1.9.1 — funcional, desplegable, en producción en Cloudflare Pages. Ver
 [`CHANGELOG.md`](./CHANGELOG.md) para el detalle de qué incluye, y el
 historial de commits para el desarrollo por fases.

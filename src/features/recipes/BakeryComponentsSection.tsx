@@ -312,7 +312,7 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
                     <button
                       type="button"
                       onClick={() => void handleDelete(c.id)}
-                      className="text-neutral-400 hover:text-red-600"
+                      className="rounded-md border border-red-200 bg-white px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
                     >
                       Eliminar
                     </button>

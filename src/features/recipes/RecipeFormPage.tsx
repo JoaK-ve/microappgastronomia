@@ -374,7 +374,7 @@ export function RecipeFormPage() {
                   <button
                     type="button"
                     onClick={() => removeStep(index)}
-                    className="shrink-0 text-neutral-400 hover:text-red-600"
+                    className="shrink-0 rounded-md border border-red-200 bg-white px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
                   >
                     Eliminar
                   </button>

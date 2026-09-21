@@ -268,18 +268,18 @@ export function RecipeComponentsSection({ recipeId, businessId }: { recipeId: st
                       </span>
                     )}
                   </span>
-                  <span className="flex gap-3">
+                  <span className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => startEdit(component)}
-                      className="text-neutral-500 hover:text-brand-600"
+                      className="rounded-md border border-neutral-300 bg-white px-3 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-50"
                     >
                       Editar
                     </button>
                     <button
                       type="button"
                       onClick={() => void handleDelete(component.id)}
-                      className="text-neutral-400 hover:text-red-600"
+                      className="rounded-md border border-red-200 bg-white px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
                     >
                       Eliminar
                     </button>

@@ -4,6 +4,10 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.10.1
+
+**Editar y Eliminar ahora son botones** (antes eran texto suelto, difíciles de distinguir y de pulsar en móvil). "Editar" con borde neutro, "Eliminar" con borde y texto rojo. Aplica a los componentes de la receta, a la tabla de fórmula panadera y a los pasos de elaboración. Solo estilo, sin cambios de comportamiento.
+
 ## V1.10.0
 
 **Editar recetas sin pelearse con la pantalla** — a raíz de un reporte de uso real: "le doy a Guardar cambios y no hace nada" y "para cambiar un ingrediente de una receta tengo que borrarlo y añadirlo de nuevo".

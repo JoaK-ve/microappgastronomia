@@ -4,6 +4,21 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.9.0
+
+**Respaldo y restauración por negocio** — a petición del usuario ("como hacemos en WheelOS"): cada negocio puede llevarse una copia de SUS datos y volver a cargarla, sin depender de la plataforma. Configuración → "Respaldo" (solo admin).
+
+- **Descargar respaldo**: baja un `.json` con los ingredientes, formatos de compra y precios, equivalencias, historial de precios, alérgenos, categorías, recetas, componentes y producciones del negocio. Nombre `oidochef-respaldo-<negocio>-<fecha>.json`.
+- **Restaurar desde un archivo**: valida el archivo, muestra un resumen ("el respaldo trae X… ahora tienes Y…") y exige marcar "Entiendo que esto reemplaza mis datos actuales" antes de tocar nada. **Reemplaza** lo actual por lo del archivo.
+- No toca usuarios, contraseñas, plan/prueba del negocio ni el logo. (Un respaldo viejo no puede "devolver" un trial vigente.)
+- **Dos funciones nuevas en la base de datos**, `export_business_backup()` y `restore_business_backup(jsonb)`. Son `SECURITY DEFINER` (la RLS no da al admin borrado sobre todas estas tablas) pero todo queda acotado a mano al negocio de quien llama: solo admin; restaurar exige además negocio operativo (SA-3: un negocio suspendido no escribe, aunque sí puede descargar sus datos); `business_id` se fuerza al de la sesión en cada fila, nunca el del archivo; los ids se insertan con `INSERT` plano (jamás upsert), así que un archivo manipulado con ids ajenos choca con la clave primaria en vez de pisar nada; y el archivo solo restaura en el negocio del que salió.
+- **Todo o nada**: una sola transacción. Un fallo a mitad de la restauración deja el negocio exactamente como estaba.
+- **Red de seguridad**: antes de reemplazar se guarda una copia del estado actual en `backup.snapshots` (`reason = 'pre_restore'`, con quién y cuándo, conservada 90 días). El usuario no puede recuperarla por sí mismo — si restaura el archivo equivocado, la plataforma puede devolverla.
+- Genérico a propósito (exporta con `to_jsonb`, restaura las columnas que traiga el archivo y deja el DEFAULT de las que falten): una columna nueva en el futuro no se pierde en silencio, y los archivos viejos siguen restaurando.
+- **Probado de verdad contra producción con cuentas y negocios desechables (55 comprobaciones)**: ida y vuelta idéntica tabla por tabla; cocina y anónimos rechazados; archivo de otro negocio rechazado; cabecera falsificada, componentes/historial de precios/alérgenos que apuntan a datos de otro negocio, y 9 tipos de archivo mal formado, todos rechazados sin tocar nada; autor de producción inexistente; archivo anterior a columnas nuevas; fallo tardío con deshacer completo; negocio suspendido. La prueba encontró un bug real antes de salir (la exportación ordenaba por una columna `id` que `ingredient_allergens` no tiene) — corregido en `20260921100100_fix_export_ordering.sql`. Además se probó el flujo completo en pantalla (descargar, borrar datos, restaurar, errores del archivo).
+- 14 tests unitarios nuevos para la validación del archivo (`backupFile.test.ts`).
+- **Límite**: la copia previa vive en la misma base de datos, igual que el respaldo diario de V1.8.2.
+
 ## V1.8.2
 
 **Respaldo diario automático dentro de Supabase** — a petición del usuario, tras un aviso de Supabase sobre suspensión por inactividad de proyectos gratuitos.

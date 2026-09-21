@@ -13,6 +13,8 @@ type ConfirmDialogProps = {
   onCancel: () => void
   loading?: boolean
   error?: string | null
+  /** Deshabilita el botón de confirmar (p. ej. hasta marcar un "entiendo" en acciones muy destructivas). */
+  confirmDisabled?: boolean
 }
 
 export function ConfirmDialog({
@@ -26,6 +28,7 @@ export function ConfirmDialog({
   onCancel,
   loading = false,
   error = null,
+  confirmDisabled = false,
 }: ConfirmDialogProps) {
   useEffect(() => {
     if (!open) return
@@ -72,7 +75,7 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={onConfirm}
-              disabled={loading}
+              disabled={loading || confirmDisabled}
               className="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
               {loading ? loadingLabel : confirmLabel}

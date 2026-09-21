@@ -2,6 +2,7 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
+import { BackupSection } from '@/features/settings/BackupSection'
 import type { Business, Profile, UserRole } from '@/types'
 
 const LOGO_BUCKET = 'logos'
@@ -55,6 +56,8 @@ export function SettingsPage() {
 
         {profile?.role === 'admin' && <InviteUserForm onInvited={loadData} />}
       </section>
+
+      {profile?.role === 'admin' && <BackupSection />}
     </div>
   )
 }

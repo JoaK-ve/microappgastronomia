@@ -4,6 +4,14 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.1
+
+**Logo e identidad visual propia** — hasta ahora la pantalla de login solo tenía el texto "Iniciar sesión" y la pestaña del navegador mostraba el ícono genérico de Vite; nunca se había puesto la marca real de OídoChef en ninguno de los dos sitios.
+
+- Pantalla de login: el logo (ícono + "OídoChef" + "Sistema Gastronómico Profesional") arriba de la tarjeta.
+- Favicon: el símbolo de la marca, generado en 32px y 16px a partir del original para que se vea nítido en la pestaña.
+- Solo visual, sin cambios de comportamiento.
+
 ## V1.11.0
 
 **Aviso cuando el rendimiento no cuadra con los ingredientes** — a raíz de un caso real (Mix de Especias): los ingredientes sumaban 360 g pero el rendimiento decía 260 g, y el coste por gramo (coste total ÷ rendimiento) salía 0,0088 € en vez de 0,0064 €.

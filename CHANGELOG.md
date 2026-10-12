@@ -4,6 +4,13 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.3
+
+**El logo del sidebar ya se actualiza al instante** — otro hallazgo de la auditoría de código: al cambiar o quitar el logo del negocio en Configuración, el menú lateral seguía mostrando el anterior hasta recargar la página (F5).
+
+- Configuración ahora le avisa directamente al menú que se actualice, sin esperar a nada.
+- Verificado en producción con una cuenta desechable: subir logo, quitar logo, los dos reflejados al instante en el menú, sin recargar.
+
 ## V1.11.2
 
 **Guardar alérgenos de un ingrediente ya no puede perderse en silencio** — hallazgo de una auditoría de código: el reemplazo se hacía como un borrado y un alta por separado desde el navegador, sin transacción ni revisar si cada paso tenía éxito. Si el segundo paso fallaba (corte de red, pestaña cerrada a mitad), el ingrediente se quedaba sin ningún alérgeno registrado, sin ningún aviso en pantalla — información de seguridad alimentaria perdida sin que nadie se enterara.

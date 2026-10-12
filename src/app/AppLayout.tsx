@@ -1,4 +1,4 @@
-import { useEffect, useState, type ComponentType, type SVGProps } from 'react'
+import { useEffect, useRef, useState, type ComponentType, type SVGProps } from 'react'
 import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
@@ -37,6 +37,11 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/configuracion', label: 'Configuración', end: false, adminOnly: true, icon: IconGear },
 ]
 
+// Contexto que AppLayout pasa a todas las pantallas anidadas (vía <Outlet
+// context={...}>) — hoy solo lo usa Configuración, para que el logo del
+// sidebar se actualice al momento tras cambiarlo, sin esperar a un F5.
+export type AppLayoutContext = { refreshBusiness: () => void }
+
 const DESKTOP_LINK_CLASS = ({ isActive }: { isActive: boolean }) =>
   `flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium ${
     isActive ? 'bg-brand-500 text-white' : 'text-neutral-300 hover:bg-neutral-800'
@@ -60,50 +65,63 @@ export function AppLayout() {
     setAccountOpen(false)
   }, [location.pathname])
 
+  // Importante: el valor inicial de useRef solo aplica en el montaje real,
+  // nunca de nuevo — así que en modo desarrollo (React StrictMode monta,
+  // desmonta y vuelve a montar para probar los efectos) el flag quedaría en
+  // `false` para siempre tras el primer ciclo si solo se pusiera `true` una
+  // vez. Por eso se re-arma dentro del propio efecto, que sí se vuelve a
+  // ejecutar en cada (re)montaje.
+  const mountedRef = useRef(false)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
+  async function loadBusiness(businessId: string) {
+    const { data } = await supabase
+      .from('businesses')
+      .select('logo_url, status, trial_ends_at')
+      .eq('id', businessId)
+      .single()
+
+    if (!mountedRef.current) return
+
+    const business = data as Pick<Business, 'logo_url' | 'status' | 'trial_ends_at'> | null
+
+    const path = business?.logo_url
+    if (!path) {
+      setLogoUrl(null)
+    } else {
+      const { data: signed } = await supabase.storage.from(LOGO_BUCKET).createSignedUrl(path, 3600)
+      if (mountedRef.current) setLogoUrl(signed?.signedUrl ?? null)
+    }
+
+    if (business) {
+      const effective = getEffectiveStatus(business)
+      setEffectiveStatus(effective)
+      setDaysRemaining(getDaysRemaining(business, effective))
+    } else {
+      setEffectiveStatus(null)
+    }
+  }
+
   useEffect(() => {
     if (!profile?.business_id) {
       setLogoUrl(null)
       setEffectiveStatus(null)
       return
     }
-
-    let cancelled = false
-
-    supabase
-      .from('businesses')
-      .select('logo_url, status, trial_ends_at')
-      .eq('id', profile.business_id)
-      .single()
-      .then(({ data }) => {
-        if (cancelled) return
-
-        const business = data as Pick<Business, 'logo_url' | 'status' | 'trial_ends_at'> | null
-
-        const path = business?.logo_url
-        if (!path) {
-          setLogoUrl(null)
-        } else {
-          supabase.storage
-            .from(LOGO_BUCKET)
-            .createSignedUrl(path, 3600)
-            .then(({ data: signed }) => {
-              if (!cancelled) setLogoUrl(signed?.signedUrl ?? null)
-            })
-        }
-
-        if (business) {
-          const effective = getEffectiveStatus(business)
-          setEffectiveStatus(effective)
-          setDaysRemaining(getDaysRemaining(business, effective))
-        } else {
-          setEffectiveStatus(null)
-        }
-      })
-
-    return () => {
-      cancelled = true
-    }
+    void loadBusiness(profile.business_id)
   }, [profile?.business_id])
+
+  // Expuesto vía Outlet context — Configuración lo llama tras guardar el
+  // negocio, para que un logo nuevo (o quitado) se vea en el sidebar sin
+  // tener que recargar la página.
+  function refreshBusiness() {
+    if (profile?.business_id) void loadBusiness(profile.business_id)
+  }
 
   // Un usuario AUTENTICADO sin perfil de negocio es (o debería ser) un
   // Super Admin puro — nunca se le asigna un negocio automáticamente. En
@@ -209,7 +227,7 @@ export function AppLayout() {
         </nav>
 
         <main className="flex-1 p-4 pb-24 print:p-0 md:p-8 md:pb-8">
-          <Outlet />
+          <Outlet context={{ refreshBusiness } satisfies AppLayoutContext} />
         </main>
 
         {/* Barra inferior: solo móvil/tablet estrecho. Todos los iconos

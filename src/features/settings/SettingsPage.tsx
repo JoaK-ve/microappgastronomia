@@ -1,8 +1,10 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useOutletContext } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { BackupSection } from '@/features/settings/BackupSection'
+import type { AppLayoutContext } from '@/app/AppLayout'
 import type { Business, Profile, UserRole } from '@/types'
 
 const LOGO_BUCKET = 'logos'
@@ -12,6 +14,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function SettingsPage() {
   const { profile } = useAuth()
+  const { refreshBusiness } = useOutletContext<AppLayoutContext>()
   const [business, setBusiness] = useState<Business | null>(null)
   const [users, setUsers] = useState<Profile[]>([])
   const [loading, setLoading] = useState(true)
@@ -25,6 +28,13 @@ export function SettingsPage() {
     setBusiness((businessResult.data as Business) ?? null)
     setUsers((usersResult.data as Profile[]) ?? [])
     setLoading(false)
+  }
+
+  // Tras guardar el negocio (nombre, datos de contacto o logo), también
+  // refresca el sidebar — si no, un logo nuevo tarda hasta un F5 en verse ahí.
+  function handleBusinessSaved() {
+    void loadData()
+    refreshBusiness()
   }
 
   useEffect(() => {
@@ -44,7 +54,7 @@ export function SettingsPage() {
       <section className="rounded-lg border border-neutral-200 bg-white p-4">
         <h2 className="text-lg font-medium">Negocio</h2>
         {profile?.role === 'admin' && business ? (
-          <BusinessForm business={business} onSaved={loadData} />
+          <BusinessForm business={business} onSaved={handleBusinessSaved} />
         ) : (
           <BusinessReadOnly business={business} />
         )}

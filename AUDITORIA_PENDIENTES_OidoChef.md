@@ -5,7 +5,7 @@ Generado: 2026-10-06. Marca `[x]` cuando esté arreglado Y verificado que sigue 
 confirmar que el arreglo quedó bien y encontrar lo que haya quedado nuevo.
 
 ## 🟠 Errores reales confirmados
-- [ ] **Alérgenos de un ingrediente pueden perderse en silencio al guardar** — `src/features/ingredients/IngredientFormPage.tsx:97-107` — el reemplazo es un DELETE + INSERT en dos pasos, sin transacción ni revisar errores.
+- [x] **Alérgenos de un ingrediente pueden perderse en silencio al guardar** — `src/features/ingredients/IngredientFormPage.tsx:97-107` — el reemplazo es un DELETE + INSERT en dos pasos, sin transacción ni revisar errores. *Arreglado en V1.11.2: función `replace_ingredient_allergens()` atómica, verificado en producción.*
 - [ ] **Logo del sidebar no se actualiza tras cambiarlo en Configuración** — `src/app/AppLayout.tsx:63-106` / `src/features/settings/SettingsPage.tsx:19-28` — hace falta recargar la página para verlo.
 
 ## 🟡 Rendimiento y arquitectura

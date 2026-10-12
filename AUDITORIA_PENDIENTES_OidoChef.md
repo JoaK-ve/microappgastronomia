@@ -12,7 +12,7 @@ confirmar que el arreglo quedó bien y encontrar lo que haya quedado nuevo.
 - [x] **Editar una fila de la fórmula panadera la escribe dos veces** — `src/features/recipes/BakeryComponentsSection.tsx:151-156`. *Arreglado en V1.11.4: una sola escritura por fila, verificado en producción (3 llamadas en vez de 4, datos idénticos).*
 - [ ] **Dashboard de Super Admin: una consulta por negocio** (ya anotado en el propio código) — `src/features/super-admin/SuperAdminDashboardPage.tsx:76-86`
 - [x] **Consulta de coste separada del resto en 3 pantallas** — `RecipeComponentsSection.tsx:43-58`, `BakeryComponentsSection.tsx:44-67`, `RecipeViewPage.tsx:54-82`. *Arreglado en V1.11.5: va en el mismo Promise.all, verificado en producción (admin ve el costo igual en las 3 pantallas, cocina sigue sin verlo, sin errores).*
-- [ ] **`handlePastonBlur` espera un guardado que no necesita esperar** — `BakeryComponentsSection.tsx:89-100`
+- [x] **`handlePastonBlur` espera un guardado que no necesita esperar** — `BakeryComponentsSection.tsx:89-100`. *Arreglado en V1.11.6: guardado y recálculo en paralelo, verificado en producción (paston_grams, paston_quantity y gramos recalculados, los tres correctos en la base de datos).*
 - [ ] **Falta índice en `profiles.business_id`** — `supabase/migrations/20260817074911_schema_v1.sql`
 
 ## 🔵 Datos, respaldos y seguridad

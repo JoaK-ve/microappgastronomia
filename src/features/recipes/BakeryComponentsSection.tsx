@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { flourGramsFrom, gramsForRow } from '@/features/recipes/bakeryFormula'
+import { INGREDIENT_DELETED_LABEL } from '@/lib/recipeFormatting'
 import type { Ingredient, Recipe, RecipeComponent, RecipeComponentCost, RecipeCost } from '@/types'
 
 // La fórmula panadera en sí (ver bakeryFormula.ts, con tests contra datos
@@ -70,7 +71,7 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
   }
 
   function ingredientName(id: string | null) {
-    return ingredients.find((i) => i.id === id)?.name ?? 'Ingrediente eliminado'
+    return ingredients.find((i) => i.id === id)?.name ?? INGREDIENT_DELETED_LABEL
   }
 
   // Escribe cada fila UNA sola vez: los gramos recalculados junto con el
@@ -286,7 +287,7 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
                       className="max-w-[12rem] rounded-md border border-neutral-200 px-1 py-1 text-sm"
                     >
                       {!ingredients.some((i) => i.id === c.ingredient_id) && (
-                        <option value={c.ingredient_id ?? ''}>Ingrediente eliminado</option>
+                        <option value={c.ingredient_id ?? ''}>{INGREDIENT_DELETED_LABEL}</option>
                       )}
                       {ingredients.map((ingredient) => (
                         <option key={ingredient.id} value={ingredient.id}>

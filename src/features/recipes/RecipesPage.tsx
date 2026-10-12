@@ -3,12 +3,8 @@ import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { bakeryBasePath, useBakeryMode } from '@/features/recipes/useBakeryMode'
+import { formatYield } from '@/lib/recipeFormatting'
 import type { Recipe, RecipeCost } from '@/types'
-
-function formatYield(recipe: Recipe) {
-  if (recipe.yield_quantity == null || !recipe.yield_unit) return '—'
-  return `${recipe.yield_quantity} ${recipe.yield_unit}`
-}
 
 function formatCost(cost: RecipeCost | undefined) {
   if (!cost || !cost.is_complete || cost.total_cost == null) {

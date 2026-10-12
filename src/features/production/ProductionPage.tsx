@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
+import { RECIPE_DELETED_LABEL } from '@/lib/recipeFormatting'
 import type { Production, ProductionReference, Profile, Recipe } from '@/types'
 
 // Sin decimales, redondeado al múltiplo de 5 más cercano (lo que de verdad
@@ -69,7 +70,7 @@ export function ProductionPage() {
   )
 
   function recipeName(recipeId: string) {
-    return recipes.find((r) => r.id === recipeId)?.name ?? 'Receta eliminada'
+    return recipes.find((r) => r.id === recipeId)?.name ?? RECIPE_DELETED_LABEL
   }
 
   function producerName(userId: string | null) {

@@ -2,12 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
+import { formatYield } from '@/lib/recipeFormatting'
 import type { Recipe, RecipeCategory, RecipeCost } from '@/types'
-
-function formatYield(recipe: Recipe) {
-  if (recipe.yield_quantity == null || !recipe.yield_unit) return '—'
-  return `${recipe.yield_quantity} ${recipe.yield_unit}`
-}
 
 export function EscandalloPage() {
   const { profile, loading: authLoading } = useAuth()

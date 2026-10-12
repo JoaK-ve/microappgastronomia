@@ -1,4 +1,5 @@
 import { ALLERGEN_LABEL } from '@/lib/allergens'
+import { INGREDIENT_DELETED_LABEL, RECIPE_DELETED_LABEL } from '@/lib/recipeFormatting'
 import type { Allergen, Recipe, RecipeComponent } from '@/types'
 
 function componentName(
@@ -7,9 +8,9 @@ function componentName(
   recipeNames: Record<string, string>,
 ) {
   if (component.component_type === 'ingredient') {
-    return ingredientNames[component.ingredient_id ?? ''] ?? 'Ingrediente eliminado'
+    return ingredientNames[component.ingredient_id ?? ''] ?? INGREDIENT_DELETED_LABEL
   }
-  return recipeNames[component.component_recipe_id ?? ''] ?? 'Receta eliminada'
+  return recipeNames[component.component_recipe_id ?? ''] ?? RECIPE_DELETED_LABEL
 }
 
 export function CocinaView({

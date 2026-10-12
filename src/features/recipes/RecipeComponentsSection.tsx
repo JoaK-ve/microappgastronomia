@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
+import { INGREDIENT_DELETED_LABEL, RECIPE_DELETED_LABEL } from '@/lib/recipeFormatting'
 import type { Ingredient, Recipe, RecipeComponent, RecipeComponentType, RecipeCost, Unit } from '@/types'
 
 const UNITS: Unit[] = ['g', 'kg', 'ml', 'L', 'ud']
@@ -61,9 +62,9 @@ export function RecipeComponentsSection({
 
   function displayName(component: RecipeComponent) {
     if (component.component_type === 'ingredient') {
-      return ingredients.find((i) => i.id === component.ingredient_id)?.name ?? 'Ingrediente eliminado'
+      return ingredients.find((i) => i.id === component.ingredient_id)?.name ?? INGREDIENT_DELETED_LABEL
     }
-    return recipes.find((r) => r.id === component.component_recipe_id)?.name ?? 'Receta eliminada'
+    return recipes.find((r) => r.id === component.component_recipe_id)?.name ?? RECIPE_DELETED_LABEL
   }
 
   async function handleAdd(event: FormEvent) {

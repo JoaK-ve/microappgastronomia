@@ -4,6 +4,14 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.8
+
+**Limpieza de duplicación (dos hallazgos chicos de la auditoría)**:
+
+- `formatYield()` estaba copiado palabra por palabra en dos pantallas (Recetas y Escandallo) — ahora vive una sola vez en `src/lib/recipeFormatting.ts`.
+- El texto "Ingrediente eliminado" / "Receta eliminada" (cuando un componente apunta a algo que ya no existe) estaba escrito suelto en 4 archivos distintos — ahora son dos constantes compartidas, para que la redacción nunca se desvíe entre pantallas.
+- Sin cambios de comportamiento ni de resultado — verificado en producción que una receta con su ingrediente real se sigue viendo igual en Cocina y en Editar.
+
 ## V1.11.7
 
 **Limpieza de código muerto** — hallazgo de la auditoría: `IconMore`, un ícono que quedó del diseño de navegación anterior, ya no lo usaba ninguna pantalla. Eliminado. Sin cambios de comportamiento ni de interfaz.

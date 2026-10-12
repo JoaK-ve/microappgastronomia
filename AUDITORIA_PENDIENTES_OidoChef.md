@@ -22,7 +22,7 @@ confirmar que el arreglo quedó bien y encontrar lo que haya quedado nuevo.
 - [x] **`IconMore` sin usar** — `src/components/icons/NavIcons.tsx:89-97`. *Eliminado en V1.11.7.*
 - [ ] **Sidebar duplicado entre `AppLayout.tsx` y `SuperAdminLayout.tsx`**
 - [ ] **Aviso de "coste incompleto" escrito 6 veces con textos distintos**
-- [ ] **Formato de dinero (`.toFixed(2) €`) repetido en 15+ lugares, sin `formatCurrency()`**
+- [x] **Formato de dinero (`.toFixed(2) €`) repetido en 15+ lugares, sin `formatCurrency()`**. *Arreglado en V1.11.9: una sola función en `src/lib/format.ts`, verificado en producción.*
 - [x] **"Ingrediente/receta eliminada" reimplementado 4 veces**. *Arreglado en V1.11.8: dos constantes compartidas en `src/lib/recipeFormatting.ts`, verificado en producción.*
 - [x] **`formatYield()` copiado literal en `RecipesPage.tsx` y `EscandalloPage.tsx`**. *Arreglado en V1.11.8: una sola función en `src/lib/recipeFormatting.ts`.*
 - [ ] **Manejo del error "ciclo detectado" duplicado dentro de `RecipeComponentsSection.tsx`**

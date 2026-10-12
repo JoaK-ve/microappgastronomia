@@ -1,3 +1,4 @@
+import { formatCurrency } from '@/lib/format'
 import type { RecipeComponentCost, RecipeCost } from '@/types'
 
 export function CostesView({
@@ -31,11 +32,11 @@ export function CostesView({
                     {component.quantity} {component.unit}
                   </td>
                   <td className="py-2 pr-4 text-neutral-600">
-                    {component.unit_cost != null ? `${component.unit_cost.toFixed(4)} €` : '—'}
+                    {component.unit_cost != null ? formatCurrency(component.unit_cost, 4) : '—'}
                   </td>
                   <td className="py-2">
                     {component.component_cost != null ? (
-                      `${component.component_cost.toFixed(2)} €`
+                      formatCurrency(component.component_cost)
                     ) : (
                       <span className="text-amber-600" title={component.missing_reason ?? undefined}>
                         Pendiente
@@ -53,12 +54,12 @@ export function CostesView({
         {cost?.is_complete && cost.total_cost != null ? (
           <div className="space-y-1">
             <p>
-              Coste total: <strong>{cost.total_cost.toFixed(2)} €</strong>
+              Coste total: <strong>{formatCurrency(cost.total_cost)}</strong>
             </p>
             <p>
               Coste por unidad de rendimiento:{' '}
               {cost.unit_cost != null ? (
-                <strong>{cost.unit_cost.toFixed(4)} €</strong>
+                <strong>{formatCurrency(cost.unit_cost, 4)}</strong>
               ) : (
                 <span className="text-amber-600">— (falta definir el rendimiento)</span>
               )}

@@ -8,6 +8,7 @@ import { CocinaView } from '@/features/recipes/views/CocinaView'
 import { CostesView } from '@/features/recipes/views/CostesView'
 import { ProducirView } from '@/features/recipes/views/ProducirView'
 import { CompletaView } from '@/features/recipes/views/CompletaView'
+import { formatCurrency } from '@/lib/format'
 import type {
   Allergen,
   Ingredient,
@@ -154,7 +155,7 @@ export function RecipeViewPage() {
             {isAdmin && (
               <>
                 {' · '}
-                Coste: {cost?.total_cost != null ? `${cost.total_cost.toFixed(2)} €` : 'incompleto'}
+                Coste: {cost?.total_cost != null ? formatCurrency(cost.total_cost) : 'incompleto'}
               </>
             )}
             {' · '}

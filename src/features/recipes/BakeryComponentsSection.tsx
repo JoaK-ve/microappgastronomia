@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { flourGramsFrom, gramsForRow } from '@/features/recipes/bakeryFormula'
+import { formatCurrency } from '@/lib/format'
 import { INGREDIENT_DELETED_LABEL } from '@/lib/recipeFormatting'
 import type { Ingredient, Recipe, RecipeComponent, RecipeComponentCost, RecipeCost } from '@/types'
 
@@ -197,11 +198,11 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
         <div className="mt-3 space-y-1 rounded-md bg-neutral-50 px-3 py-2 text-sm">
           {cost.is_complete && cost.total_cost != null ? (
             <p>
-              Food cost total: <strong>{cost.total_cost.toFixed(2)} €</strong>
+              Food cost total: <strong>{formatCurrency(cost.total_cost)}</strong>
               {Number(cantidad) > 0 && (
                 <>
                   {' '}
-                  — por pieza: <strong>{(cost.total_cost / Number(cantidad)).toFixed(2)} €</strong>
+                  — por pieza: <strong>{formatCurrency(cost.total_cost / Number(cantidad))}</strong>
                 </>
               )}
             </p>
@@ -323,7 +324,7 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
                   {isAdmin && (
                     <td className="py-2 pr-2 text-right text-neutral-600">
                       {componentCosts[c.id]?.component_cost != null
-                        ? `${componentCosts[c.id].component_cost!.toFixed(2)} €`
+                        ? formatCurrency(componentCosts[c.id].component_cost!)
                         : '—'}
                     </td>
                   )}

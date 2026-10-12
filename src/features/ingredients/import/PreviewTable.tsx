@@ -1,3 +1,4 @@
+import { formatCurrency } from '@/lib/format'
 import type { Unit } from '@/types'
 import { StatusBadge } from '@/features/ingredients/import/StatusBadge'
 import { evaluateRow, type NameMatchIndex } from '@/features/ingredients/import/buildRows'
@@ -131,7 +132,7 @@ export function PreviewTable({
                   onChange={(e) => updateRow(row.clientId, { priceRaw: e.target.value || null })}
                   className="w-20 rounded-md border border-neutral-300 px-2 py-1 text-sm"
                 />
-                {row.price != null && <p className="mt-1 text-xs text-neutral-400">{row.price.toFixed(2)} €</p>}
+                {row.price != null && <p className="mt-1 text-xs text-neutral-400">{formatCurrency(row.price)}</p>}
               </td>
               <td className="px-3 py-2">
                 <StatusBadge status={row.status} />

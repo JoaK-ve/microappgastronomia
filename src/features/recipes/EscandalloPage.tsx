@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
+import { formatCurrency } from '@/lib/format'
 import { formatYield } from '@/lib/recipeFormatting'
 import type { Recipe, RecipeCategory, RecipeCost } from '@/types'
 
@@ -142,7 +143,7 @@ export function EscandalloPage() {
                   <td className="px-4 py-2 text-neutral-600">{formatYield(recipe)}</td>
                   <td className="px-4 py-2">
                     {cost?.is_complete && cost.total_cost != null ? (
-                      `${cost.total_cost.toFixed(2)} €`
+                      formatCurrency(cost.total_cost)
                     ) : (
                       <span className="text-amber-600" title={cost?.missing_reasons?.join(' ') ?? undefined}>
                         Coste incompleto
@@ -151,7 +152,7 @@ export function EscandalloPage() {
                   </td>
                   <td className="px-4 py-2">
                     {cost?.is_complete && cost.unit_cost != null ? (
-                      `${cost.unit_cost.toFixed(4)} €`
+                      formatCurrency(cost.unit_cost, 4)
                     ) : cost?.is_complete ? (
                       <span className="text-amber-600" title="Falta definir el rendimiento">
                         —

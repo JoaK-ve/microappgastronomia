@@ -4,6 +4,12 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.9
+
+**Formato de dinero consolidado** — otro hallazgo de la auditoría: `0.00 €` se escribía a mano en más de 15 lugares distintos (recetas, ingredientes, formatos de compra, el importador). Ahora una sola función (`formatCurrency`) en `src/lib/format.ts`.
+
+- Sin cambios de comportamiento ni de resultado — verificado en producción: un ingrediente con precio real sigue mostrando el mismo coste por unidad (4 decimales) y el mismo precio (2 decimales) en la lista, la ficha y los formatos de compra.
+
 ## V1.11.8
 
 **Limpieza de duplicación (dos hallazgos chicos de la auditoría)**:

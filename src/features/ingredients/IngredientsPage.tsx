@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
+import { formatCurrency } from '@/lib/format'
 import type { Ingredient, IngredientCost } from '@/types'
 
 export function IngredientsPage() {
@@ -119,7 +120,7 @@ export function IngredientsPage() {
                   {isAdmin && (
                     <td className="px-4 py-2">
                       {cost?.unit_cost != null ? (
-                        `${cost.unit_cost.toFixed(4)} €/${ingredient.usage_unit}`
+                        `${formatCurrency(cost.unit_cost, 4)}/${ingredient.usage_unit}`
                       ) : (
                         <span className="text-amber-600" title={cost?.missing_reason ?? undefined}>
                           Pendiente

@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
+import { formatCurrency } from '@/lib/format'
 import { INGREDIENT_DELETED_LABEL, RECIPE_DELETED_LABEL } from '@/lib/recipeFormatting'
 import type { Ingredient, Recipe, RecipeComponent, RecipeComponentType, RecipeCost, Unit } from '@/types'
 
@@ -169,11 +170,11 @@ export function RecipeComponentsSection({
         <div className="mt-3 space-y-1 rounded-md bg-neutral-50 px-3 py-2 text-sm">
           {cost.is_complete && cost.total_cost != null ? (
             <p>
-              Coste total: <strong>{cost.total_cost.toFixed(2)} €</strong>
+              Coste total: <strong>{formatCurrency(cost.total_cost)}</strong>
               {cost.unit_cost != null ? (
                 <>
                   {' '}
-                  — Coste por unidad de rendimiento: <strong>{cost.unit_cost.toFixed(4)} €</strong>
+                  — Coste por unidad de rendimiento: <strong>{formatCurrency(cost.unit_cost, 4)}</strong>
                 </>
               ) : (
                 <span className="text-amber-600">

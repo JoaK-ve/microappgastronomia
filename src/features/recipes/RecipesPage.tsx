@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { bakeryBasePath, useBakeryMode } from '@/features/recipes/useBakeryMode'
+import { formatCurrency } from '@/lib/format'
 import { formatYield } from '@/lib/recipeFormatting'
 import type { Recipe, RecipeCost } from '@/types'
 
@@ -14,7 +15,7 @@ function formatCost(cost: RecipeCost | undefined) {
       </span>
     )
   }
-  return `${cost.total_cost.toFixed(2)} €`
+  return formatCurrency(cost.total_cost)
 }
 
 export function RecipesPage() {

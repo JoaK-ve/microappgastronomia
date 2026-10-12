@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '@/lib/supabase'
+import { formatCurrency } from '@/lib/format'
 import type { IngredientCost, PurchaseFormat, Unit } from '@/types'
 
 const UNITS: Unit[] = ['g', 'kg', 'ml', 'L', 'ud']
@@ -74,7 +75,7 @@ export function PurchaseFormatsSection({ ingredientId, businessId }: { ingredien
       <div className="mt-2 rounded-md bg-neutral-50 px-3 py-2 text-sm">
         {cost?.unit_cost != null ? (
           <span>
-            Coste actual: <strong>{cost.unit_cost.toFixed(4)} €</strong> por unidad de uso
+            Coste actual: <strong>{formatCurrency(cost.unit_cost, 4)}</strong> por unidad de uso
           </span>
         ) : (
           <span className="text-amber-600">{cost?.missing_reason ?? 'Añade un formato de compra para calcular el coste.'}</span>
@@ -100,7 +101,7 @@ export function PurchaseFormatsSection({ ingredientId, businessId }: { ingredien
                   <td className="py-2 pr-4">
                     {format.quantity} {format.unit}
                   </td>
-                  <td className="py-2 pr-4">{format.price.toFixed(2)} €</td>
+                  <td className="py-2 pr-4">{formatCurrency(format.price)}</td>
                   <td className="py-2 pr-4 text-neutral-500">{format.price_date}</td>
                   <td className="py-2 text-right">
                     <button

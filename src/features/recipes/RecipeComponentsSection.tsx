@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
+import { CostIncompleteNotice } from '@/features/recipes/CostIncomplete'
 import { formatCurrency } from '@/lib/format'
 import { componentErrorMessage, INGREDIENT_DELETED_LABEL, RECIPE_DELETED_LABEL } from '@/lib/recipeFormatting'
 import type { Ingredient, Recipe, RecipeComponent, RecipeComponentType, RecipeCost, Unit } from '@/types'
@@ -178,14 +179,7 @@ export function RecipeComponentsSection({
               )}
             </p>
           ) : (
-            <div>
-              <p className="font-medium text-amber-600">Coste incompleto</p>
-              <ul className="list-disc pl-5 text-amber-600">
-                {cost.missing_reasons.map((reason, index) => (
-                  <li key={index}>{reason}</li>
-                ))}
-              </ul>
-            </div>
+            <CostIncompleteNotice missingReasons={cost.missing_reasons} />
           )}
         </div>
       )}

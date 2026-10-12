@@ -1,3 +1,4 @@
+import { CostIncompleteNotice } from '@/features/recipes/CostIncomplete'
 import { formatCurrency } from '@/lib/format'
 import type { RecipeComponentCost, RecipeCost } from '@/types'
 
@@ -66,14 +67,7 @@ export function CostesView({
             </p>
           </div>
         ) : (
-          <div>
-            <p className="font-medium text-amber-600">Coste incompleto</p>
-            <ul className="mt-1 list-disc pl-5 text-amber-600">
-              {(cost?.missing_reasons ?? []).map((reason, index) => (
-                <li key={index}>{reason}</li>
-              ))}
-            </ul>
-          </div>
+          <CostIncompleteNotice missingReasons={cost?.missing_reasons ?? []} />
         )}
       </section>
     </div>

@@ -3,17 +3,14 @@ import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { bakeryBasePath, useBakeryMode } from '@/features/recipes/useBakeryMode'
+import { CostIncompleteBadge } from '@/features/recipes/CostIncomplete'
 import { formatCurrency } from '@/lib/format'
 import { formatYield } from '@/lib/recipeFormatting'
 import type { Recipe, RecipeCost } from '@/types'
 
 function formatCost(cost: RecipeCost | undefined) {
   if (!cost || !cost.is_complete || cost.total_cost == null) {
-    return (
-      <span className="text-amber-600" title={cost?.missing_reasons.join(' ')}>
-        Incompleto
-      </span>
-    )
+    return <CostIncompleteBadge missingReasons={cost?.missing_reasons ?? []} />
   }
   return formatCurrency(cost.total_cost)
 }

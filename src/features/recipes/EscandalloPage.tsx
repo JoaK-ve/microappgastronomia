@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
+import { CostIncompleteBadge } from '@/features/recipes/CostIncomplete'
 import { formatCurrency } from '@/lib/format'
 import { formatYield } from '@/lib/recipeFormatting'
 import type { Recipe, RecipeCategory, RecipeCost } from '@/types'
@@ -145,9 +146,7 @@ export function EscandalloPage() {
                     {cost?.is_complete && cost.total_cost != null ? (
                       formatCurrency(cost.total_cost)
                     ) : (
-                      <span className="text-amber-600" title={cost?.missing_reasons?.join(' ') ?? undefined}>
-                        Coste incompleto
-                      </span>
+                      <CostIncompleteBadge missingReasons={cost?.missing_reasons ?? []} />
                     )}
                   </td>
                   <td className="px-4 py-2">

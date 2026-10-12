@@ -4,6 +4,14 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.11
+
+**Aviso de "coste incompleto" consolidado** — último hallazgo chico de duplicación de la auditoría: el texto se escribía en 5 sitios distintos, con redacciones que ya habían empezado a desviarse ("Incompleto" en un lado, "Coste incompleto" en otro, "Food cost incompleto" en panadería). Ahora dos componentes compartidos (`CostIncompleteBadge` para tablas, `CostIncompleteNotice` para pantallas de detalle), en `src/features/recipes/CostIncomplete.tsx`.
+
+- De paso, el listado de Escandallo pasó a decir solo "Incompleto" (como ya decía el listado de Recetas) en vez de repetir "Coste incompleto" — la columna ya dice "Coste total", así que no hacía falta repetirlo.
+- Panadería sigue diciendo "Food cost incompleto" a propósito (coincide con "Food cost total" que ya usa esa pantalla).
+- Verificado en producción con una receta real sin precio: las 5 pantallas (Recetas, Escandallo, ficha, Costes, Editar, y Panadería) muestran el aviso correcto, con el motivo real tomado de la base de datos.
+
 ## V1.11.10
 
 **Limpieza de código**: el mensaje de error de "ciclo entre subrecetas" al añadir o editar un componente estaba duplicado dentro del mismo archivo. Ahora una sola función (`componentErrorMessage`) en `src/lib/recipeFormatting.ts`. Sin cambios de comportamiento — verificado contra la base de datos real en los dos casos (alta y edición), ambos siguen devolviendo el mismo mensaje.

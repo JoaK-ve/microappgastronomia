@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { flourGramsFrom, gramsForRow } from '@/features/recipes/bakeryFormula'
+import { CostIncompleteNotice } from '@/features/recipes/CostIncomplete'
 import { formatCurrency } from '@/lib/format'
 import { INGREDIENT_DELETED_LABEL } from '@/lib/recipeFormatting'
 import type { Ingredient, Recipe, RecipeComponent, RecipeComponentCost, RecipeCost } from '@/types'
@@ -207,14 +208,7 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
               )}
             </p>
           ) : (
-            <div>
-              <p className="font-medium text-amber-600">Food cost incompleto</p>
-              <ul className="list-disc pl-5 text-amber-600">
-                {cost.missing_reasons.map((reason, index) => (
-                  <li key={index}>{reason}</li>
-                ))}
-              </ul>
-            </div>
+            <CostIncompleteNotice label="Food cost" missingReasons={cost.missing_reasons} />
           )}
         </div>
       )}

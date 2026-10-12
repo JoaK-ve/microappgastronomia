@@ -4,6 +4,14 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.2
+
+**Guardar alérgenos de un ingrediente ya no puede perderse en silencio** — hallazgo de una auditoría de código: el reemplazo se hacía como un borrado y un alta por separado desde el navegador, sin transacción ni revisar si cada paso tenía éxito. Si el segundo paso fallaba (corte de red, pestaña cerrada a mitad), el ingrediente se quedaba sin ningún alérgeno registrado, sin ningún aviso en pantalla — información de seguridad alimentaria perdida sin que nadie se enterara.
+
+- Nueva función `replace_ingredient_allergens()` en la base de datos: hace el reemplazo completo en una sola transacción — si algo falla, no queda nada a medias.
+- Si falla, ahora sí se ve un mensaje claro en pantalla en vez de fallar en silencio.
+- Verificado en producción con una cuenta desechable: alta, reemplazo, vaciado, y rechazo correcto de un ingrediente ajeno — todo probado de verdad, no solo en teoría.
+
 ## V1.11.1
 
 **Logo e identidad visual propia** — hasta ahora la pantalla de login solo tenía el texto "Iniciar sesión" y la pestaña del navegador mostraba el ícono genérico de Vite; nunca se había puesto la marca real de OídoChef en ninguno de los dos sitios.

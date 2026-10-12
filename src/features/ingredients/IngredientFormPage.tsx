@@ -93,17 +93,15 @@ export function IngredientFormPage() {
   }
 
   // Reemplaza siempre el conjunto completo: más simple que calcular el
-  // diff, y el volumen (máximo 14 filas) no lo justifica.
-  async function saveAllergens(targetIngredientId: string) {
-    await supabase.from('ingredient_allergens').delete().eq('ingredient_id', targetIngredientId)
-    if (allergens.size === 0 || !profile) return
-    await supabase.from('ingredient_allergens').insert(
-      Array.from(allergens).map((allergen) => ({
-        ingredient_id: targetIngredientId,
-        allergen,
-        business_id: profile.business_id,
-      })),
-    )
+  // diff, y el volumen (máximo 14 filas) no lo justifica. El reemplazo en sí
+  // (borrar + insertar) pasa por una función SQL que lo hace en una sola
+  // transacción — si falla, no deja el ingrediente a medias sin avisar.
+  async function saveAllergens(targetIngredientId: string): Promise<boolean> {
+    const { error: rpcError } = await supabase.rpc('replace_ingredient_allergens', {
+      p_ingredient_id: targetIngredientId,
+      p_allergens: Array.from(allergens),
+    })
+    return !rpcError
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -126,8 +124,11 @@ export function IngredientFormPage() {
         return
       }
 
-      await saveAllergens(ingredientId)
+      const allergensSaved = await saveAllergens(ingredientId)
       setSaving(false)
+      if (!allergensSaved) {
+        setError('El ingrediente se guardó, pero no se pudieron guardar sus alérgenos. Vuelve a intentarlo.')
+      }
       return
     }
 
@@ -143,9 +144,15 @@ export function IngredientFormPage() {
       return
     }
 
-    await saveAllergens(data.id)
-    setSaving(false)
     setIngredientId(data.id)
+    const allergensSaved = await saveAllergens(data.id)
+    setSaving(false)
+
+    if (!allergensSaved) {
+      setError('El ingrediente se creó, pero no se pudieron guardar sus alérgenos. Vuelve a intentarlo.')
+      return
+    }
+
     navigate(`/ingredientes/${data.id}`, { replace: true })
   }
 

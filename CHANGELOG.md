@@ -4,6 +4,14 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.4
+
+**Editar una fila de la fórmula panadera escribe la mitad de veces** — otro hallazgo de la auditoría de código: cambiar el % o el ingrediente de una fila guardaba esa fila dos veces (una vez el campo tocado, y otra vez más junto con el recálculo de gramos de toda la tabla). Sin impacto visible, pero el doble de escrituras a la base de datos de las necesarias.
+
+- Ahora cada fila se guarda una sola vez por edición, con los gramos recalculados y el resto de sus datos juntos en la misma escritura.
+- Verificado en producción con una cuenta desechable: editar el % de una fila pasó de 4 escrituras a 3 (una por fila de la fórmula); los datos quedaron idénticos a los que ya daba antes.
+- Sin cambios de comportamiento ni de resultado, solo menos trabajo para la base de datos.
+
 ## V1.11.3
 
 **El logo del sidebar ya se actualiza al instante** — otro hallazgo de la auditoría de código: al cambiar o quitar el logo del negocio en Configuración, el menú lateral seguía mostrando el anterior hasta recargar la página (F5).

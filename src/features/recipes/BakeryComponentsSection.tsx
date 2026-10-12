@@ -71,6 +71,13 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
     return ingredients.find((i) => i.id === id)?.name ?? 'Ingrediente eliminado'
   }
 
+  // Escribe cada fila UNA sola vez: los gramos recalculados junto con el
+  // resto de sus columnas (is_flour_base/flour_percent/ingredient_id) tal
+  // como ya están en `rows` — para la fila que acaba de cambiar, `rows` ya
+  // trae ese cambio fusionado (ver handleRowChange); para las demás es
+  // simplemente su valor de siempre, así que reescribirlo es inofensivo.
+  // Antes, editar una fila hacía un update aparte para el campo tocado y
+  // LUEGO otro aquí mismo para esa misma fila — doble escritura innecesaria.
   async function recalcAndSave(rows: RecipeComponent[], pastonNum: number, cantidadNum: number) {
     if (!pastonNum || !cantidadNum || rows.length === 0) return
     const totalDough = pastonNum * cantidadNum
@@ -80,7 +87,16 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
     await Promise.all(
       rows.map((r) => {
         const grams = gramsForRow(r.flour_percent, result.flourGrams)
-        return supabase.from('recipe_components').update({ quantity: grams, unit: 'g' }).eq('id', r.id)
+        return supabase
+          .from('recipe_components')
+          .update({
+            quantity: grams,
+            unit: 'g',
+            is_flour_base: r.is_flour_base,
+            flour_percent: r.flour_percent,
+            ingredient_id: r.ingredient_id,
+          })
+          .eq('id', r.id)
       }),
     )
     void loadAll()
@@ -151,7 +167,6 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
   async function handleRowChange(id: string, patch: { flour_percent?: number; is_flour_base?: boolean; ingredient_id?: string }) {
     const updated = components.map((c) => (c.id === id ? { ...c, ...patch } : c))
     setComponents(updated)
-    await supabase.from('recipe_components').update(patch).eq('id', id)
     await recalcAndSave(updated, Number(paston), Number(cantidad))
   }
 

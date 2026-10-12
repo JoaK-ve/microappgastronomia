@@ -51,14 +51,27 @@ export function RecipeViewPage() {
   async function loadAll(recipeId: string) {
     setLoading(true)
 
-    const [{ data: recipeData }, { data: compsData }, { data: ingredientsData }, { data: recipesData }, { data: allergensData }] =
-      await Promise.all([
-        supabase.from('recipes').select('*').eq('id', recipeId).single(),
-        supabase.from('recipe_components').select('*').eq('recipe_id', recipeId).order('position'),
-        supabase.from('ingredients').select('*'),
-        supabase.from('recipes').select('id, name'),
-        supabase.from('recipe_allergens').select('*').eq('recipe_id', recipeId).single(),
-      ])
+    // El coste (solo admin) no depende de ninguna de las otras consultas —
+    // va en el mismo Promise.all en vez de esperarlo aparte después.
+    const [
+      { data: recipeData },
+      { data: compsData },
+      { data: ingredientsData },
+      { data: recipesData },
+      { data: allergensData },
+      costResult,
+      componentCostsResult,
+    ] = await Promise.all([
+      supabase.from('recipes').select('*').eq('id', recipeId).single(),
+      supabase.from('recipe_components').select('*').eq('recipe_id', recipeId).order('position'),
+      supabase.from('ingredients').select('*'),
+      supabase.from('recipes').select('id, name'),
+      supabase.from('recipe_allergens').select('*').eq('recipe_id', recipeId).single(),
+      isAdmin
+        ? supabase.from('recipe_costs').select('*').eq('recipe_id', recipeId).single()
+        : Promise.resolve({ data: null }),
+      isAdmin ? supabase.rpc('get_recipe_component_costs', { p_recipe_id: recipeId }) : Promise.resolve({ data: null }),
+    ])
 
     setRecipe((recipeData as Recipe) ?? null)
     setComponents((compsData as RecipeComponent[]) ?? [])
@@ -73,12 +86,8 @@ export function RecipeViewPage() {
     setRecipeNames(recMap)
 
     if (isAdmin) {
-      const [{ data: costData }, { data: componentCostsData }] = await Promise.all([
-        supabase.from('recipe_costs').select('*').eq('recipe_id', recipeId).single(),
-        supabase.rpc('get_recipe_component_costs', { p_recipe_id: recipeId }),
-      ])
-      setCost((costData as RecipeCost) ?? null)
-      setComponentCosts((componentCostsData as RecipeComponentCost[]) ?? [])
+      setCost((costResult.data as RecipeCost) ?? null)
+      setComponentCosts((componentCostsResult.data as RecipeComponentCost[]) ?? [])
     }
 
     setLoading(false)

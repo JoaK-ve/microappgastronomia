@@ -41,10 +41,16 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
   }
 
   async function loadAll() {
-    const [{ data: recipeData }, comps, { data: ings }] = await Promise.all([
+    // El coste (solo admin) no depende de las otras consultas — va en el
+    // mismo Promise.all en vez de esperarlo aparte después.
+    const [{ data: recipeData }, comps, { data: ings }, costResult, componentCostsResult] = await Promise.all([
       supabase.from('recipes').select('*').eq('id', recipeId).single(),
       fetchComponents(),
       supabase.from('ingredients').select('*').order('name'),
+      isAdmin
+        ? supabase.from('recipe_costs').select('*').eq('recipe_id', recipeId).single()
+        : Promise.resolve({ data: null }),
+      isAdmin ? supabase.rpc('get_recipe_component_costs', { p_recipe_id: recipeId }) : Promise.resolve({ data: null }),
     ])
 
     const r = (recipeData as Recipe) ?? null
@@ -54,13 +60,9 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
     setIngredients((ings as Ingredient[]) ?? [])
 
     if (isAdmin) {
-      const [{ data: costData }, { data: componentCostsData }] = await Promise.all([
-        supabase.from('recipe_costs').select('*').eq('recipe_id', recipeId).single(),
-        supabase.rpc('get_recipe_component_costs', { p_recipe_id: recipeId }),
-      ])
-      setCost((costData as RecipeCost) ?? null)
+      setCost((costResult.data as RecipeCost) ?? null)
       const map: Record<string, RecipeComponentCost> = {}
-      for (const c of (componentCostsData as (RecipeComponentCost & { component_id: string })[]) ?? []) {
+      for (const c of (componentCostsResult.data as (RecipeComponentCost & { component_id: string })[]) ?? []) {
         map[c.component_id] = c
       }
       setComponentCosts(map)

@@ -4,6 +4,14 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.5
+
+**Abrir una receta ahorra una vuelta de red** — otro hallazgo de la auditoría de código: la consulta del coste (solo para quien administra) se esperaba aparte, después de las demás, aunque no dependía de ellas para nada.
+
+- Afecta a la ficha de receta, su edición y la fórmula panadera.
+- Verificado en producción con una cuenta desechable: el coste se sigue viendo igual para quien administra (ficha, pestaña Costes, edición, panadería), y sigue sin verse para cocina, sin errores en ninguno de los dos casos.
+- Sin cambios de comportamiento ni de resultado, solo una pizca menos de espera al abrir una receta.
+
 ## V1.11.4
 
 **Editar una fila de la fórmula panadera escribe la mitad de veces** — otro hallazgo de la auditoría de código: cambiar el % o el ingrediente de una fila guardaba esa fila dos veces (una vez el campo tocado, y otra vez más junto con el recálculo de gramos de toda la tabla). Sin impacto visible, pero el doble de escrituras a la base de datos de las necesarias.

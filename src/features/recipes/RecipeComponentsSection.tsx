@@ -41,20 +41,22 @@ export function RecipeComponentsSection({
   }, [recipeId, isAdmin])
 
   async function loadAll() {
-    const [{ data: comps }, { data: ings }, { data: recs }] = await Promise.all([
+    // El coste no depende de ninguna de las otras tres consultas — va en el
+    // mismo Promise.all en vez de esperarlo aparte después, para no sumar
+    // una vuelta de red más de la necesaria al abrir la receta.
+    const [{ data: comps }, { data: ings }, { data: recs }, costResult] = await Promise.all([
       supabase.from('recipe_components').select('*').eq('recipe_id', recipeId).order('position'),
       supabase.from('ingredients').select('*').order('name'),
       supabase.from('recipes').select('*').neq('id', recipeId).order('name'),
+      isAdmin
+        ? supabase.from('recipe_costs').select('*').eq('recipe_id', recipeId).single()
+        : Promise.resolve({ data: null }),
     ])
     setComponents((comps as RecipeComponent[]) ?? [])
     onComponentsChange?.((comps as RecipeComponent[]) ?? [])
     setIngredients((ings as Ingredient[]) ?? [])
     setRecipes((recs as Recipe[]) ?? [])
-
-    if (isAdmin) {
-      const { data: costData } = await supabase.from('recipe_costs').select('*').eq('recipe_id', recipeId).single()
-      setCost((costData as RecipeCost) ?? null)
-    }
+    setCost(isAdmin ? ((costResult.data as RecipeCost) ?? null) : null)
   }
 
   function displayName(component: RecipeComponent) {

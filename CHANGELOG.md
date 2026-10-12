@@ -4,6 +4,10 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.7
+
+**Limpieza de código muerto** — hallazgo de la auditoría: `IconMore`, un ícono que quedó del diseño de navegación anterior, ya no lo usaba ninguna pantalla. Eliminado. Sin cambios de comportamiento ni de interfaz.
+
 ## V1.11.6
 
 **Cambiar el Paston o la Cantidad en la fórmula panadera responde un poco más rápido** — otro hallazgo de la auditoría de código: se guardaba el peso/cantidad y LUEGO se esperaba el recálculo de gramos, aunque no dependían uno del otro.

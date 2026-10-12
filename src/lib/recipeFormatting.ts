@@ -13,3 +13,12 @@ export function formatYield(recipe: Pick<Recipe, 'yield_quantity' | 'yield_unit'
 // aquí en un solo sitio para que no se desvíe entre pantallas.
 export const INGREDIENT_DELETED_LABEL = 'Ingrediente eliminado'
 export const RECIPE_DELETED_LABEL = 'Receta eliminada'
+
+// Al añadir o editar un componente de receta, la base de datos puede
+// rechazarlo por crear un ciclo entre subrecetas (trigger
+// trg_recipe_components_no_cycle) — ese mensaje sí es útil mostrarlo tal
+// cual. Cualquier otro error usa el mensaje genérico que pase cada pantalla
+// (es distinto según si fue un alta o una edición).
+export function componentErrorMessage(error: { message: string } | null | undefined, fallback: string) {
+  return error?.message.includes('circular') ? error.message : fallback
+}

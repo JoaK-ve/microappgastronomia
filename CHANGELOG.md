@@ -4,6 +4,10 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.10
+
+**Limpieza de código**: el mensaje de error de "ciclo entre subrecetas" al añadir o editar un componente estaba duplicado dentro del mismo archivo. Ahora una sola función (`componentErrorMessage`) en `src/lib/recipeFormatting.ts`. Sin cambios de comportamiento — verificado contra la base de datos real en los dos casos (alta y edición), ambos siguen devolviendo el mismo mensaje.
+
 ## V1.11.9
 
 **Formato de dinero consolidado** — otro hallazgo de la auditoría: `0.00 €` se escribía a mano en más de 15 lugares distintos (recetas, ingredientes, formatos de compra, el importador). Ahora una sola función (`formatCurrency`) en `src/lib/format.ts`.

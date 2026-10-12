@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { formatCurrency } from '@/lib/format'
-import { INGREDIENT_DELETED_LABEL, RECIPE_DELETED_LABEL } from '@/lib/recipeFormatting'
+import { componentErrorMessage, INGREDIENT_DELETED_LABEL, RECIPE_DELETED_LABEL } from '@/lib/recipeFormatting'
 import type { Ingredient, Recipe, RecipeComponent, RecipeComponentType, RecipeCost, Unit } from '@/types'
 
 const UNITS: Unit[] = ['g', 'kg', 'ml', 'L', 'ud']
@@ -91,11 +91,7 @@ export function RecipeComponentsSection({
     const { error: insertError } = await supabase.from('recipe_components').insert(payload)
 
     if (insertError) {
-      setError(
-        insertError.message.includes('circular')
-          ? insertError.message
-          : 'No se pudo añadir el componente.',
-      )
+      setError(componentErrorMessage(insertError, 'No se pudo añadir el componente.'))
       return
     }
 
@@ -149,9 +145,7 @@ export function RecipeComponentsSection({
     setEditSaving(false)
 
     if (updateError) {
-      setEditError(
-        updateError.message.includes('circular') ? updateError.message : 'No se pudo guardar el cambio.',
-      )
+      setEditError(componentErrorMessage(updateError, 'No se pudo guardar el cambio.'))
       return
     }
 

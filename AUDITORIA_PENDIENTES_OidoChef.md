@@ -19,7 +19,7 @@ confirmar que el arreglo quedó bien y encontrar lo que haya quedado nuevo.
 - [ ] **Sin paginación en listas de ingredientes/recetas/dashboard** (vigilar si algún negocio crece mucho) — `IngredientsPage.tsx:22`, `RecipesPage.tsx:40`, `EscandalloPage.tsx:33-36`, `SuperAdminDashboardPage.tsx:68`
 
 ## ⚪ Código muerto y duplicación (bajo riesgo)
-- [ ] **`IconMore` sin usar** — `src/components/icons/NavIcons.tsx:89-97`
+- [x] **`IconMore` sin usar** — `src/components/icons/NavIcons.tsx:89-97`. *Eliminado en V1.11.7.*
 - [ ] **Sidebar duplicado entre `AppLayout.tsx` y `SuperAdminLayout.tsx`**
 - [ ] **Aviso de "coste incompleto" escrito 6 veces con textos distintos**
 - [ ] **Formato de dinero (`.toFixed(2) €`) repetido en 15+ lugares, sin `formatCurrency()`**

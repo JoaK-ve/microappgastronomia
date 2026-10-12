@@ -109,12 +109,13 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
     const cantidadNum = Number(cantidad)
     if (!pastonNum || !cantidadNum) return
 
-    await supabase
-      .from('recipes')
-      .update({ paston_grams: pastonNum, paston_quantity: cantidadNum })
-      .eq('id', recipeId)
-
-    await recalcAndSave(components, pastonNum, cantidadNum)
+    // El guardado del Paston/Cantidad y el recálculo de gramos no dependen
+    // uno del otro (recalcAndSave ya usa pastonNum/cantidadNum, no necesita
+    // esperar a que el UPDATE de recipes termine) — van en paralelo.
+    await Promise.all([
+      supabase.from('recipes').update({ paston_grams: pastonNum, paston_quantity: cantidadNum }).eq('id', recipeId),
+      recalcAndSave(components, pastonNum, cantidadNum),
+    ])
   }
 
   async function handleAdd() {

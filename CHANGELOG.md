@@ -4,6 +4,14 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.6
+
+**Cambiar el Paston o la Cantidad en la fórmula panadera responde un poco más rápido** — otro hallazgo de la auditoría de código: se guardaba el peso/cantidad y LUEGO se esperaba el recálculo de gramos, aunque no dependían uno del otro.
+
+- Ahora los dos pasos van al mismo tiempo.
+- Verificado en producción con una cuenta desechable: cambiar el Paston de 500 a 300 g guardó el dato y recalculó los gramos correctamente (confirmado en la base de datos, no solo en pantalla).
+- Sin cambios de comportamiento ni de resultado.
+
 ## V1.11.5
 
 **Abrir una receta ahorra una vuelta de red** — otro hallazgo de la auditoría de código: la consulta del coste (solo para quien administra) se esperaba aparte, después de las demás, aunque no dependía de ellas para nada.

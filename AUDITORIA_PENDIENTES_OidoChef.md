@@ -13,7 +13,7 @@ confirmar que el arreglo quedó bien y encontrar lo que haya quedado nuevo.
 - [ ] **Dashboard de Super Admin: una consulta por negocio** (ya anotado en el propio código) — `src/features/super-admin/SuperAdminDashboardPage.tsx:76-86`
 - [x] **Consulta de coste separada del resto en 3 pantallas** — `RecipeComponentsSection.tsx:43-58`, `BakeryComponentsSection.tsx:44-67`, `RecipeViewPage.tsx:54-82`. *Arreglado en V1.11.5: va en el mismo Promise.all, verificado en producción (admin ve el costo igual en las 3 pantallas, cocina sigue sin verlo, sin errores).*
 - [x] **`handlePastonBlur` espera un guardado que no necesita esperar** — `BakeryComponentsSection.tsx:89-100`. *Arreglado en V1.11.6: guardado y recálculo en paralelo, verificado en producción (paston_grams, paston_quantity y gramos recalculados, los tres correctos en la base de datos).*
-- [ ] **Falta índice en `profiles.business_id`** — `supabase/migrations/20260817074911_schema_v1.sql`
+- [x] **Falta índice en `profiles.business_id`** — `supabase/migrations/20260817074911_schema_v1.sql`. *Arreglado: `profiles_business_id_idx`, verificado que existe en producción. Sin cambios de app, no suma versión.*
 
 ## 🔵 Datos, respaldos y seguridad
 - [ ] **Sin paginación en listas de ingredientes/recetas/dashboard** (vigilar si algún negocio crece mucho) — `IngredientsPage.tsx:22`, `RecipesPage.tsx:40`, `EscandalloPage.tsx:33-36`, `SuperAdminDashboardPage.tsx:68`

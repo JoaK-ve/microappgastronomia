@@ -9,7 +9,7 @@ confirmar que el arreglo quedó bien y encontrar lo que haya quedado nuevo.
 - [x] **Logo del sidebar no se actualiza tras cambiarlo en Configuración** — `src/app/AppLayout.tsx:63-106` / `src/features/settings/SettingsPage.tsx:19-28` — hace falta recargar la página para verlo. *Arreglado en V1.11.3: Configuración avisa al sidebar vía Outlet context, verificado en producción (subir y quitar logo, ambos sin recargar).*
 
 ## 🟡 Rendimiento y arquitectura
-- [ ] **Editar una fila de la fórmula panadera la escribe dos veces** — `src/features/recipes/BakeryComponentsSection.tsx:151-156`
+- [x] **Editar una fila de la fórmula panadera la escribe dos veces** — `src/features/recipes/BakeryComponentsSection.tsx:151-156`. *Arreglado en V1.11.4: una sola escritura por fila, verificado en producción (3 llamadas en vez de 4, datos idénticos).*
 - [ ] **Dashboard de Super Admin: una consulta por negocio** (ya anotado en el propio código) — `src/features/super-admin/SuperAdminDashboardPage.tsx:76-86`
 - [ ] **Consulta de coste separada del resto en 3 pantallas** — `RecipeComponentsSection.tsx:43-58`, `BakeryComponentsSection.tsx:44-67`, `RecipeViewPage.tsx:54-82`
 - [ ] **`handlePastonBlur` espera un guardado que no necesita esperar** — `BakeryComponentsSection.tsx:89-100`

@@ -27,4 +27,4 @@ confirmar que el arreglo quedó bien y encontrar lo que haya quedado nuevo.
 - [x] **`formatYield()` copiado literal en `RecipesPage.tsx` y `EscandalloPage.tsx`**. *Arreglado en V1.11.8: una sola función en `src/lib/recipeFormatting.ts`.*
 - [x] **Manejo del error "ciclo detectado" duplicado dentro de `RecipeComponentsSection.tsx`**. *Arreglado en V1.11.10: función `componentErrorMessage()` compartida, verificado contra la base de datos real (alta y edición, ambas rechazadas con el mismo mensaje).*
 - [x] **Carga del coste de receta duplicada entre `RecipeComponentsSection.tsx` y `BakeryComponentsSection.tsx`**. *Arreglado en V1.11.12: función `recipeCostQuery()` compartida, verificado en producción (receta normal y de panadería).*
-- [ ] **Barra de guardado con confirmación visible: falta llevarla de Recetas a Ingredientes** — `IngredientFormPage.tsx:341-347`
+- [x] **Barra de guardado con confirmación visible: falta llevarla de Recetas a Ingredientes** — `IngredientFormPage.tsx:341-347`. *Arreglado en V1.11.13: barra fija + confirmación, verificado en producción (botón visible sin scroll, mensaje, nombre persistido).*

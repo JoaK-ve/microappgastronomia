@@ -4,6 +4,15 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.13
+
+**Guardar un ingrediente ya se siente igual que guardar una receta** — hallazgo de la auditoría: la pantalla de editar un ingrediente nunca recibió la mejora de V1.10.0 (barra de guardado fija, confirmación visible), y se quedó con un botón suelto al final sin ningún aviso.
+
+- Barra fija abajo, siempre visible sin hacer scroll, igual que en Recetas.
+- "✓ Cambios guardados" al terminar, que desaparece solo a los 5 segundos.
+- Si falla, el error sale junto al botón, no arriba del todo.
+- Verificado en producción: crear un ingrediente, cambiarle el nombre, guardar — el botón visible sin scroll, el mensaje de confirmación, y el nombre nuevo confirmado en la base de datos.
+
 ## V1.11.12
 
 **Limpieza de código**: la consulta del coste de una receta (solo admin) estaba repetida igual entre `RecipeComponentsSection.tsx` y `BakeryComponentsSection.tsx`. Ahora una sola función (`recipeCostQuery`) en `src/lib/recipeFormatting.ts`, usada en el mismo `Promise.all` de cada pantalla (no cambia el ahorro de V1.11.5). Sin cambios de comportamiento ni de resultado — verificado en producción que el costo se sigue mostrando igual en una receta normal y en una de panadería.

@@ -29,6 +29,13 @@ export function IngredientFormPage() {
   const [notFound, setNotFound] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [savedAt, setSavedAt] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!savedAt) return
+    const timer = setTimeout(() => setSavedAt(null), 5000)
+    return () => clearTimeout(timer)
+  }, [savedAt])
 
   const [deleteState, setDeleteState] = useState<'idle' | 'checking' | 'blocked' | 'confirm' | 'deleting'>('idle')
   const [deleteBlockers, setDeleteBlockers] = useState<IngredientDeleteBlockers | null>(null)
@@ -107,6 +114,7 @@ export function IngredientFormPage() {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
+    setSavedAt(null)
 
     if (!profile) return
 
@@ -128,7 +136,9 @@ export function IngredientFormPage() {
       setSaving(false)
       if (!allergensSaved) {
         setError('El ingrediente se guardó, pero no se pudieron guardar sus alérgenos. Vuelve a intentarlo.')
+        return
       }
+      setSavedAt(Date.now())
       return
     }
 
@@ -263,8 +273,6 @@ export function IngredientFormPage() {
         <h2 className="text-lg font-medium">Datos básicos</h2>
 
         <form onSubmit={handleSubmit} className="mt-3 space-y-3">
-          {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
-
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-neutral-700">
               Nombre
@@ -345,13 +353,25 @@ export function IngredientFormPage() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-          >
-            {saving ? 'Guardando…' : ingredientId ? 'Guardar cambios' : 'Crear ingrediente'}
-          </button>
+          <div className="sticky bottom-0 z-10 -mx-1 flex flex-wrap items-center gap-3 border-t border-neutral-200 bg-white/95 px-1 py-3 backdrop-blur">
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-md bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            >
+              {saving ? 'Guardando…' : ingredientId ? 'Guardar cambios' : 'Crear ingrediente'}
+            </button>
+            {savedAt && (
+              <p role="status" className="text-sm font-medium text-green-700">
+                ✓ Cambios guardados
+              </p>
+            )}
+            {error && (
+              <p role="alert" className="rounded-md bg-red-50 px-3 py-1.5 text-sm text-red-700">
+                {error}
+              </p>
+            )}
+          </div>
         </form>
       </section>
 

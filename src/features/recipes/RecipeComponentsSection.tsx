@@ -3,7 +3,12 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 import { CostIncompleteNotice } from '@/features/recipes/CostIncomplete'
 import { formatCurrency } from '@/lib/format'
-import { componentErrorMessage, INGREDIENT_DELETED_LABEL, RECIPE_DELETED_LABEL } from '@/lib/recipeFormatting'
+import {
+  componentErrorMessage,
+  INGREDIENT_DELETED_LABEL,
+  RECIPE_DELETED_LABEL,
+  recipeCostQuery,
+} from '@/lib/recipeFormatting'
 import type { Ingredient, Recipe, RecipeComponent, RecipeComponentType, RecipeCost, Unit } from '@/types'
 
 const UNITS: Unit[] = ['g', 'kg', 'ml', 'L', 'ud']
@@ -51,9 +56,7 @@ export function RecipeComponentsSection({
       supabase.from('recipe_components').select('*').eq('recipe_id', recipeId).order('position'),
       supabase.from('ingredients').select('*').order('name'),
       supabase.from('recipes').select('*').neq('id', recipeId).order('name'),
-      isAdmin
-        ? supabase.from('recipe_costs').select('*').eq('recipe_id', recipeId).single()
-        : Promise.resolve({ data: null }),
+      recipeCostQuery(recipeId, isAdmin),
     ])
     setComponents((comps as RecipeComponent[]) ?? [])
     onComponentsChange?.((comps as RecipeComponent[]) ?? [])

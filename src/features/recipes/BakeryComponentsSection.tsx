@@ -4,7 +4,7 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { flourGramsFrom, gramsForRow } from '@/features/recipes/bakeryFormula'
 import { CostIncompleteNotice } from '@/features/recipes/CostIncomplete'
 import { formatCurrency } from '@/lib/format'
-import { INGREDIENT_DELETED_LABEL } from '@/lib/recipeFormatting'
+import { INGREDIENT_DELETED_LABEL, recipeCostQuery } from '@/lib/recipeFormatting'
 import type { Ingredient, Recipe, RecipeComponent, RecipeComponentCost, RecipeCost } from '@/types'
 
 // La fórmula panadera en sí (ver bakeryFormula.ts, con tests contra datos
@@ -50,9 +50,7 @@ export function BakeryComponentsSection({ recipeId, businessId }: { recipeId: st
       supabase.from('recipes').select('*').eq('id', recipeId).single(),
       fetchComponents(),
       supabase.from('ingredients').select('*').order('name'),
-      isAdmin
-        ? supabase.from('recipe_costs').select('*').eq('recipe_id', recipeId).single()
-        : Promise.resolve({ data: null }),
+      recipeCostQuery(recipeId, isAdmin),
       isAdmin ? supabase.rpc('get_recipe_component_costs', { p_recipe_id: recipeId }) : Promise.resolve({ data: null }),
     ])
 

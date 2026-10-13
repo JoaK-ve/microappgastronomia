@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState, type ComponentType, type SVGProps } from 'react'
-import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Navigate, Outlet } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
-import { ChangePasswordControl } from '@/components/ChangePasswordControl'
-import { APP_VERSION_DISPLAY } from '@/lib/version'
+import { SidebarShell, type NavItem as SidebarNavItem } from '@/components/SidebarShell'
 import { getDaysRemaining, getEffectiveStatus, type EffectiveStatus } from '@/lib/businessLifecycle'
 import {
   IconBook,
@@ -12,20 +11,13 @@ import {
   IconHome,
   IconLeaf,
   IconPot,
-  IconUser,
   IconWheat,
 } from '@/components/icons/NavIcons'
 import type { Business } from '@/types'
 
 const LOGO_BUCKET = 'logos'
 
-type NavItem = {
-  to: string
-  label: string
-  end: boolean
-  adminOnly: boolean
-  icon: ComponentType<SVGProps<SVGSVGElement>>
-}
+type NavItem = SidebarNavItem & { adminOnly: boolean }
 
 const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Inicio', end: true, adminOnly: false, icon: IconHome },
@@ -42,28 +34,12 @@ const NAV_ITEMS: NavItem[] = [
 // sidebar se actualice al momento tras cambiarlo, sin esperar a un F5.
 export type AppLayoutContext = { refreshBusiness: () => void }
 
-const DESKTOP_LINK_CLASS = ({ isActive }: { isActive: boolean }) =>
-  `flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium ${
-    isActive ? 'bg-brand-500 text-white' : 'text-neutral-300 hover:bg-neutral-800'
-  }`
-
-const MOBILE_TAB_CLASS = ({ isActive }: { isActive: boolean }) =>
-  `flex w-16 shrink-0 flex-col items-center gap-0.5 py-2 text-[10px] font-medium ${
-    isActive ? 'text-brand-400' : 'text-neutral-400'
-  }`
-
 export function AppLayout() {
   const { session, profile, signOut } = useAuth()
-  const location = useLocation()
   const isAdmin = profile?.role === 'admin'
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [effectiveStatus, setEffectiveStatus] = useState<EffectiveStatus | null>(null)
   const [daysRemaining, setDaysRemaining] = useState(0)
-  const [accountOpen, setAccountOpen] = useState(false)
-
-  useEffect(() => {
-    setAccountOpen(false)
-  }, [location.pathname])
 
   // Importante: el valor inicial de useRef solo aplica en el montaje real,
   // nunca de nuevo — así que en modo desarrollo (React StrictMode monta,
@@ -161,23 +137,20 @@ export function AppLayout() {
   const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin)
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900">
-      <div className="flex min-h-screen flex-col md:flex-row">
-        <nav
-          aria-label="Navegación principal"
-          className="flex flex-col border-b border-neutral-800 bg-neutral-900 text-neutral-50 print:hidden md:w-56 md:border-b-0 md:border-r"
-        >
-          <div className="px-4 py-3 md:py-5">
-            {logoUrl ? (
-              <>
-                <img src={logoUrl} alt="Logo del negocio" className="h-12 max-w-full object-contain md:h-16" />
-                <p className="mt-1.5 truncate text-xs text-neutral-400">MicroApp Gastronómica</p>
-              </>
-            ) : (
-              <span className="truncate text-lg font-semibold text-brand-100">MicroApp Gastronómica</span>
-            )}
-          </div>
-
+    <SidebarShell
+      navItems={visibleItems}
+      header={
+        logoUrl ? (
+          <>
+            <img src={logoUrl} alt="Logo del negocio" className="h-12 max-w-full object-contain md:h-16" />
+            <p className="mt-1.5 truncate text-xs text-neutral-400">MicroApp Gastronómica</p>
+          </>
+        ) : (
+          <span className="truncate text-lg font-semibold text-brand-100">MicroApp Gastronómica</span>
+        )
+      }
+      banner={
+        <>
           {effectiveStatus === 'trial' && (
             <div className="mx-4 mb-3 rounded-md bg-green-50 px-3 py-2 text-xs text-green-800">
               🟢 Prueba gratuita
@@ -194,92 +167,18 @@ export function AppLayout() {
               continuar utilizando la plataforma.
             </div>
           )}
-
-          {/* Navegación completa: solo escritorio. En móvil vive en la barra inferior. */}
-          <ul className="hidden flex-col gap-0.5 px-2 md:flex">
-            {visibleItems.map((item) => (
-              <li key={item.to}>
-                <NavLink to={item.to} end={item.end} className={DESKTOP_LINK_CLASS}>
-                  <item.icon className="h-4.5 w-4.5 shrink-0" />
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-auto border-t border-neutral-800 px-4 py-3 text-sm">
-            <p className="hidden truncate font-medium md:block">{profile?.name}</p>
-            <p className="hidden truncate text-neutral-400 md:block">{profile?.email}</p>
-            <div className="flex flex-wrap gap-3 md:mt-2">
-              <ChangePasswordControl variant="dark" />
-              <button
-                type="button"
-                onClick={() => void signOut()}
-                className="text-neutral-400 underline hover:text-white"
-              >
-                Cerrar sesión
-              </button>
-            </div>
-          </div>
-          <p className="hidden border-t border-neutral-800 px-4 py-2 text-right text-xs text-neutral-500 md:block">
-            {APP_VERSION_DISPLAY}
-          </p>
-        </nav>
-
-        <main className="flex-1 p-4 pb-24 print:p-0 md:p-8 md:pb-8">
-          <Outlet context={{ refreshBusiness } satisfies AppLayoutContext} />
-        </main>
-
-        {/* Barra inferior: solo móvil/tablet estrecho. Todos los iconos
-            caben deslizando de lado (igual que la fila de arriba que
-            reemplaza) — nada se agrupa bajo un menú. */}
-        <nav
-          aria-label="Navegación móvil"
-          className="fixed inset-x-0 bottom-0 z-40 flex overflow-x-auto border-t border-neutral-800 bg-neutral-900 pb-[env(safe-area-inset-bottom)] print:hidden md:hidden"
-        >
-          {visibleItems.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end} className={MOBILE_TAB_CLASS}>
-              <item.icon className="h-5.5 w-5.5" />
-              {item.label}
-            </NavLink>
-          ))}
-          <button
-            type="button"
-            onClick={() => setAccountOpen((v) => !v)}
-            className={`flex w-16 shrink-0 flex-col items-center gap-0.5 py-2 text-[10px] font-medium ${
-              accountOpen ? 'text-brand-400' : 'text-neutral-400'
-            }`}
-          >
-            <IconUser className="h-5.5 w-5.5" />
-            Cuenta
-          </button>
-        </nav>
-
-        {accountOpen && (
-          <div
-            role="presentation"
-            className="fixed inset-0 z-30 bg-neutral-900/40 md:hidden"
-            onClick={() => setAccountOpen(false)}
-          >
-            <div
-              className="absolute inset-x-0 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] rounded-t-xl border-t border-neutral-200 bg-white p-3 shadow-lg"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <p className="truncate px-1 pb-2 text-xs text-neutral-500">{profile?.email}</p>
-              <div className="border-t border-neutral-100 px-1 py-2.5 text-sm text-neutral-700">
-                <ChangePasswordControl />
-              </div>
-              <button
-                type="button"
-                onClick={() => void signOut()}
-                className="w-full rounded-md px-1 py-2.5 text-left text-sm font-medium text-red-600"
-              >
-                Cerrar sesión
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+        </>
+      }
+      footerDetail={
+        <>
+          <p className="hidden truncate font-medium md:block">{profile?.name}</p>
+          <p className="hidden truncate text-neutral-400 md:block">{profile?.email}</p>
+        </>
+      }
+      accountDetail={<p className="truncate px-1 pb-2 text-xs text-neutral-500">{profile?.email}</p>}
+      onSignOut={() => void signOut()}
+    >
+      <Outlet context={{ refreshBusiness } satisfies AppLayoutContext} />
+    </SidebarShell>
   )
 }

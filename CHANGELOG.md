@@ -4,6 +4,15 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.14
+
+**Último hallazgo de la auditoría: el sidebar ya no está copiado y pegado** — `AppLayout.tsx` (app principal) y `SuperAdminLayout.tsx` (panel de plataforma) tenían prácticamente el mismo menú escrito dos veces. Ahora comparten un solo componente (`SidebarShell`); cada pantalla solo pone lo que de verdad es suyo: el logo o el texto fijo arriba, el aviso de prueba/gracia (solo la app principal lo tiene), y qué sale en el pie (nombre+email vs. solo email).
+
+- Sin cambios de comportamiento ni de interfaz — es limpieza de código, para que la próxima vez que cambie el diseño del menú no haga falta acordarse de tocarlo en dos sitios.
+- Verificado en producción con tres cuentas desechables (admin, cocina, y un Super Admin real): el menú, el aviso de prueba, el panel de "Cuenta", y la vista en móvil se ven exactamente igual que antes en los tres casos.
+
+Con este se cierran los 17 hallazgos de la auditoría de código — los 2 marcados como "vigilar a futuro" (paginación, dashboard de Super Admin) quedaron anotados a propósito, sin tocar.
+
 ## V1.11.13
 
 **Guardar un ingrediente ya se siente igual que guardar una receta** — hallazgo de la auditoría: la pantalla de editar un ingrediente nunca recibió la mejora de V1.10.0 (barra de guardado fija, confirmación visible), y se quedó con un botón suelto al final sin ningún aviso.

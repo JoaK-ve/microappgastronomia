@@ -4,6 +4,13 @@ Versionado de la **aplicación** (`VMAJOR.MINOR.PATCH`) — independiente
 de la versión de cada receta (`recipes.version`). MAJOR solo cambia por
 decisión explícita; MINOR y PATCH van de 0 a 20 dentro de V1.
 
+## V1.11.15
+
+**Favicon regenerado desde un master de mayor resolución** — el favicon de 16px/32px salía de un recorte antiguo; ahora se generan por reescalado de alta calidad desde un master de 512px (`public/favicon-master-512.png`), que queda guardado en el repo para no depender de un archivo suelto fuera de control de versiones.
+
+- Sin cambios de interfaz más allá del ícono de la pestaña del navegador.
+- Verificado en el navegador: `/favicon-32.png` sirve el PNG regenerado y el login carga normalmente.
+
 ## V1.11.14
 
 **Último hallazgo de la auditoría: el sidebar ya no está copiado y pegado** — `AppLayout.tsx` (app principal) y `SuperAdminLayout.tsx` (panel de plataforma) tenían prácticamente el mismo menú escrito dos veces. Ahora comparten un solo componente (`SidebarShell`); cada pantalla solo pone lo que de verdad es suyo: el logo o el texto fijo arriba, el aviso de prueba/gracia (solo la app principal lo tiene), y qué sale en el pie (nombre+email vs. solo email).
